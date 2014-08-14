@@ -1,0 +1,194 @@
+{"Groups":[
+  {
+    "UniqueId": "Group-1",
+    "Title": "Lists",
+    "Subtitle": "Common operations on lists",
+    "ImagePath": "Assets/DarkGray.png",
+    "Items":
+    [
+      {
+        "UniqueId": "Group-1-Item-1",
+        "Title": "Create a list",
+        "Subtitle": "Create a simple list named \"My List\"",
+        "ImagePath": "Assets/LightGray.png",
+        "EndPoint" : "_api/web/lists",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : { 
+            "__metadata": 
+            { 
+                "type": "SP.List" 
+            }, 
+            "AllowContentTypes": true, 
+            "BaseTemplate": 100,
+            "ContentTypesEnabled": true, 
+            "Description": "My list description", 
+            "Title": "My list" 
+        }
+      },
+      {
+        "UniqueId": "Group-1-Item-2",
+        "Title": "Read a list",
+        "Subtitle": "Read the \"My List\" items.",
+        "ImagePath": "Assets/LightGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/items",
+        "Method" : "GET",
+        "Headers" :  {
+            "Authorization" : "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically too",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : { }
+      },
+      {
+        "UniqueId": "Group-1-Item-3",
+        "Title": "Update a list",
+        "Subtitle": "Add a field to \"My List\"",
+        "ImagePath": "Assets/LightGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/Fields",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : { 
+            "__metadata": 
+            { 
+                "type": "SP.Field" 
+            }, 
+            "Title"                 : "My field title",
+            "FieldTypeKind"         : "1",
+            "Required"              : "false",
+            "EnforceUniqueValues"   : "false",
+            "StaticName"            : "MyField"
+        }
+      },
+      {
+        "UniqueId": "Group-1-Item-4",
+        "Title": "Delete a list",
+        "Subtitle": "Delete the \"My List\" list",
+        "ImagePath": "Assets/LightGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose",
+            "IF-MATCH"  : "*",
+            "X-HTTP-Method"  : "DELETE"
+        },
+        "Body" : { }
+      }
+    ]
+  },
+  {
+    "UniqueId": "Group-2",
+    "Title": "List items",
+    "Subtitle": "Perform operations on list items",
+    "ImagePath": "Assets/LightGray.png",
+    "Items":
+    [
+      {
+        "UniqueId": "Group-2-Item-1",
+        "Title": "Create a list item",
+        "Subtitle": "Create an item in the \"MyList\" list",
+        "ImagePath": "Assets/DarkGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/items",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + Accesstoken",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : { 
+            "__metadata": 
+            { 
+                "type": "SP.Data.My_x0020_listListItem" 
+            }, 
+            "Title"                 : "The item title"
+        }
+      },
+      {
+        "UniqueId": "Group-2-Item-2",
+        "Title": "Read a list item",
+        "Subtitle": "Read a specific item from the \"MyList\" list",
+        "ImagePath": "Assets/DarkGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/items(1)",
+        "Method" : "GET",
+        "Headers" :  {
+            "Authorization" : "Bearer + Accesstoken",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : { }
+      },
+      {
+        "UniqueId": "Group-2-Item-3",
+        "Title": "Update a list item",
+        "Subtitle": "Update an item in the \"MyList\" list",
+        "ImagePath": "Assets/DarkGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/items(1)",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + Accesstoken",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose",
+            "IF-MATCH"      :  "*",
+            "X-HTTP-METHOD" :  "MERGE"
+        },
+        "Body" : { 
+            "__metadata": 
+            { 
+                "type": "SP.Data.My_x0020_listListItem" 
+            }, 
+            "Title"                 : "The updated title"
+        }
+      },
+      {
+        "UniqueId": "Group-2-Item-4",
+        "Title": "Delete a list item",
+        "Subtitle": "Create an item in the \"MyList\" list",
+        "ImagePath": "Assets/DarkGray.png",
+        "EndPoint" : "_api/web/lists/getbytitle('My List')/items(1)",
+        "Method" : "POST",
+        "Headers" :  {
+            "Authorization" : "Bearer + Accesstoken",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose",
+            "IF-MATCH"      :  "*",
+            "X-HTTP-METHOD" :  "DELETE"
+        },
+        "Body" : { }
+      }
+    ]
+  },
+  {
+    "UniqueId": "Group-3",
+    "Title": "Search",
+    "Subtitle": "Query the search service",
+    "ImagePath": "Assets/MediumGray.png",
+    "Items":
+    [
+      {
+        "UniqueId": "Group-3-Item-1",
+        "Title": "Keyword search",
+        "Subtitle": "Simple keyword search",
+        "ImagePath": "Assets/MediumGray.png",
+        "EndPoint" : "_api/search/query?querytext='My List'",
+        "Method" : "GET",
+        "Headers" :  {
+            "Authorization" : "Bearer + Accesstoken",
+            "Accept"        : "application/json;odata=verbose",
+            "Content-type"  : "application/json;odata=verbose"
+        },
+        "Body" : {}
+      }
+    ]
+  }
+]
+}
