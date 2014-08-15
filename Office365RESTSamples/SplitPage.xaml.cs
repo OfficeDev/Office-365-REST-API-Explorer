@@ -22,7 +22,6 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 using Windows.Data.Json;
 using Newtonsoft.Json;
-using System.Text;
 using System.Net;
 
 // The Split Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234234
@@ -274,7 +273,6 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
-
             TokenCacheItem tokenCacheItem = await Office365Helper.GetTokenFromCache();
             string accessToken = tokenCacheItem.AccessToken;
 
@@ -320,7 +318,15 @@ namespace Office365RESTExplorerforSites
                 newStream.Write(byte1, 0, byte1.Length);
             }
 
-            endpointResponse = await endpointRequest.GetResponseAsync();
+            try
+            {
+                endpointResponse = await endpointRequest.GetResponseAsync();
+            }
+            catch (WebException we)
+            {
+                //TODO: Need to check for a condition that tells me that the token is invalid.
+                Office365Helper.ClearTokenCache();
+            }
 
             //Process response
             Stream responseStream = endpointResponse.GetResponseStream();
@@ -328,7 +334,7 @@ namespace Office365RESTExplorerforSites
             int responseLength = 100000;
             byte[] responseBytes = new byte[responseLength];
 
-            //TODO: Can I just do  responseStream.Flush(); await responseStream.ReadAsync(responseBytes, 0, responseLength);
+            //TODO: Can I just do  responseStream.Flush(); await responseStream.ReadAsync(responseBytes, 0, responseLength); Or perhaps pass the stream to a StreamReader or something?
             for (int i = 0; responseStream.CanRead; i++)
             {
                 byte[] buffer = new byte[1];
@@ -372,9 +378,6 @@ namespace Office365RESTExplorerforSites
             responseViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }
 
-        private void responseTitle1_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
     }
 }

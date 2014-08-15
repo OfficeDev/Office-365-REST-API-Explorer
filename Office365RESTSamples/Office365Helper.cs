@@ -16,8 +16,8 @@ namespace Office365RESTExplorerforSites
         public static DiscoveryContext _discoveryContext;
         public static async Task SignIn(Uri ServiceResourceId)
         {
-            Uri ServiceEndpointUri = new Uri(ServiceResourceId.AbsoluteUri + "_api/");
-            bool tokensFoundinCache = false;
+            bool tokenFoundinCache = false;
+            bool tokenFromRefreshToken = false;
             AuthenticationResult authResult;
             TokenCacheItem tci = null;
 
@@ -28,32 +28,36 @@ namespace Office365RESTExplorerforSites
 
             try
             {
+                authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(ServiceResourceId.AbsoluteUri, _discoveryContext.AppIdentity.ClientId, new UserIdentifier(_discoveryContext.LastLoggedInUser, UserIdentifierType.UniqueId));
                 tci = await Office365Helper.GetTokenFromCache();
-                
-                if(DateTimeOffset.Compare(tci.ExpiresOn, DateTimeOffset.Now) <= 0) //If the token has expired.
+
+                if (DateTimeOffset.Compare(authResult.ExpiresOn, DateTimeOffset.Now) <= 0) //If the token has expired go to the refresh flow
                 {
+                    //TODO: How do I get a new token with just the Refresh token? The following line seems to invalidate the refresh token too.
+                    //_discoveryContext.AuthenticationContext.TokenCache.Clear();
                     //Get another one with the refreshToken
                     authResult = await _discoveryContext.AuthenticationContext.AcquireTokenByRefreshTokenAsync(tci.RefreshToken, tci.ClientId, tci.Resource);
                     tci = await Office365Helper.GetTokenFromCache();
                 }
 
-                tokensFoundinCache = true;
+                tokenFromRefreshToken = true;
             }
             catch (KeyNotFoundException)
             {
                 //TODO: We need tokens, set this flag to false
-                tokensFoundinCache = false;
+                tokenFoundinCache = false;
             }
 
-            if (!tokensFoundinCache) //TODO: we might need to validate if the tokens are invalid
+            if (!tokenFoundinCache && !tokenFromRefreshToken) // Couldn't get an access token from the cache or the refreshtoken
             {
+                // We need to authenticate this time
                 ResourceDiscoveryResult dcr = await _discoveryContext.DiscoverResourceAsync(ServiceResourceId.AbsoluteUri);
-                authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(ServiceResourceId.AbsoluteUri, _discoveryContext.AppIdentity.ClientId, new Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier(dcr.UserId, Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifierType.UniqueId));
+                authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(ServiceResourceId.AbsoluteUri, _discoveryContext.AppIdentity.ClientId, new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId));
                 tci = await Office365Helper.GetTokenFromCache();
             }
 
-            ApplicationData.Current.LocalSettings.Values["UserAccount"] = tci.DisplayableId;
-            ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = tci.Resource;
+            ApplicationData.Current.LocalSettings.Values["UserAccount"] = tci.DisplayableId;    //or  authResult.UserInfo.DisplayableId;
+            ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = tci.Resource; // or ServiceResourceId.AbsoluteUri
         }
 
         public static async Task Logout()
@@ -87,6 +91,16 @@ namespace Office365RESTExplorerforSites
                     return item;
             }
             throw new KeyNotFoundException("The token was not found in the cache.");
+        }
+
+        public async static void ClearTokenCache()
+        {
+            if (_discoveryContext == null)
+            {
+                _discoveryContext = await DiscoveryContext.CreateAsync();
+            }
+
+            _discoveryContext.AuthenticationContext.TokenCache.Clear();
         }
     }
 }
