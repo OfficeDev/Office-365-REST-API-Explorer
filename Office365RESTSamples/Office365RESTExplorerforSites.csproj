@@ -14,7 +14,8 @@
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Office365RESTSamples_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Office365RESTExplorerforSites_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>71903A37F1348007BF188CDF2BADA33AC3B1B2DC</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -133,7 +134,20 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Common\ReadMe.txt" />
-    <None Include="Office365RESTSamples_TemporaryKey.pfx" />
+    <None Include="Office365RESTExplorerforSites_TemporaryKey.pfx" />
+    <Content Include="Assets\Delete.png" />
+    <Content Include="Assets\DocCreate.png" />
+    <Content Include="Assets\DocRead.png" />
+    <Content Include="Assets\Document.png" />
+    <Content Include="Assets\DocUpdate.png" />
+    <Content Include="Assets\List.png" />
+    <Content Include="Assets\ListCreate.png" />
+    <Content Include="Assets\ListItem.png" />
+    <Content Include="Assets\ListItemCreate.png" />
+    <Content Include="Assets\ListItemRead.png" />
+    <Content Include="Assets\ListItemUpdate.png" />
+    <Content Include="Assets\ListRead.png" />
+    <Content Include="Assets\ListUpdate.png" />
     <Content Include="DataModel\SampleData.json" />
     <None Include="packages.config" />
   </ItemGroup>

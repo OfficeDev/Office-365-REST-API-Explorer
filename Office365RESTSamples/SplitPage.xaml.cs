@@ -273,11 +273,28 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
-            TokenCacheItem tokenCacheItem = await Office365Helper.GetTokenFromCache();
-            string accessToken = tokenCacheItem.AccessToken;
+            //TokenCacheItem tokenCacheItem = await Office365Helper.GetTokenFromCache(
+            //                                                                ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString(), 
+            //                                                                ApplicationData.Current.LocalSettings.Values["UserId"].ToString()
+            //                                                                );
+            //tokenCacheItem.AccessToken;
+            string accessToken = null;
+            bool thereIsAccessToken = false;
+
+            // Validate that I have an access token
+            try
+            {
+                accessToken = ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString();
+                thereIsAccessToken = true;
+            }
+            catch (NullReferenceException)
+            {
+                thereIsAccessToken = false;
+            }
+            if(!thereIsAccessToken)
+                await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
 
             string method;
-
             if ((bool)getRadio.IsChecked)
                 method = "GET";
             else
@@ -325,7 +342,7 @@ namespace Office365RESTExplorerforSites
             catch (WebException we)
             {
                 //TODO: Need to check for a condition that tells me that the token is invalid.
-                Office365Helper.ClearTokenCache();
+                //Office365Helper.ClearTokenCache();
             }
 
             //Process response
@@ -350,12 +367,13 @@ namespace Office365RESTExplorerforSites
             responseString = responseString.Substring(0, responseString.IndexOf('\0'));
 
             JsonObject responseJson;
-            if(String.IsNullOrEmpty(responseString))
+            if (String.IsNullOrEmpty(responseString))
                 responseJson = new JsonObject();
+            else if (JsonObject.TryParse(responseString, out responseJson))
+                responseText.Text = JsonConvert.SerializeObject(responseJson, Formatting.Indented);
             else
-                responseJson = JsonObject.Parse(responseString);
+                responseText.Text = responseString;            
             
-            responseText.Text = JsonConvert.SerializeObject(responseJson, Formatting.Indented);
             responseUriText.Text = endpointResponse.ResponseUri.AbsoluteUri;
 
             JsonObject responseHeaders = new JsonObject();

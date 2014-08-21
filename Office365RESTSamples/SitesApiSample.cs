@@ -10,8 +10,8 @@ namespace Office365RESTSamples
     static class SitesApiSample
     {
         //TODO: Replace '<tenant>' with your SharePoint site name.
-        const string ServiceResourceId = "https://<tenant>.sharepoint.com";
-        static readonly Uri ServiceEndpointUri = new Uri("https://<tenant>.sharepoint.com/_api/");
+        const string ServiceResourceId = "https://patsoldemo.sharepoint.com";
+        static readonly Uri ServiceEndpointUri = new Uri("https://patsoldemo.sharepoint.com/_api/");
 
         // Do not make static in Web apps; store it in session or in a cookie instead
         static string _lastLoggedInUser;

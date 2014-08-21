@@ -111,10 +111,9 @@ namespace Office365RESTExplorerforSites
 
         #endregion
 
-        private async void ItemsPage_Loaded(object sender, RoutedEventArgs e)
+        private void ItemsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            Uri spSite = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-            await Office365Helper.SignIn(spSite);
+            
         }
     }
 }

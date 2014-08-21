@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Microsoft.Office365.OAuth;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -29,16 +29,31 @@ namespace Office365RESTExplorerforSites
         public StartPage()
         {
             this.InitializeComponent();
-            if (ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null)
-                spSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Uri uriSite = new Uri(spSite.Text);
-            await Office365Helper.SignIn(uriSite);
+            String[] authResult = await Office365Helper.AcquireAccessToken(spSite.Text);
 
+            ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSite.Text;
+            ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
+            ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; //authResult.UserInfo.UniqueId;
+            ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2]; //authResult.UserInfo.DisplayableId;
             this.Frame.Navigate(typeof(ItemsPage));
+        }
+
+        private async void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
+
+            if (configured)
+            {
+                String[] authResult = await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
+                ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
+                ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; //authResult.UserInfo.UniqueId;
+                ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2]; //authResult.UserInfo.DisplayableId;
+                this.Frame.Navigate(typeof(ItemsPage));
+            }
         }
     }
 }

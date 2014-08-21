@@ -78,8 +78,8 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Width="60" Height="60">
-                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}"/>
+                        <Border Width="64" Height="64">
+                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill"  AutomationProperties.Name="{Binding Title}"/>
                         </Border>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
                             <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" MaxHeight="40"/>
@@ -157,6 +157,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition Height="200"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="50"/>
@@ -166,18 +167,22 @@
                     <TextBlock x:Name="responseTitle" Text="Response" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="responseSubtitle" Margin="0,0,0,20" Text="Here is the response, you can also go back to the request" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                
                 <StackPanel x:Name="responseDetailPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock x:Name="responseUriLabel" Margin="10,0,0,0" Text="Response URI:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBox x:Name="responseUriText" MinWidth="400" Margin="10,0,0,0"></TextBox>
+                    <TextBox x:Name="responseUriText" MinWidth="400" Margin="10,0,0,0" IsReadOnly="True" ></TextBox>
                 </StackPanel>
-                <StackPanel x:Name="responseHeadersPanel" Grid.Row="2" Orientation="Vertical" VerticalAlignment="Top">
+                <StackPanel x:Name="responseMethodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="responseMethodLabel" Margin="10,0,0,0" Text="Method:" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <RadioButton x:Name="responseGetRadio" GroupName="httpMethod" Margin="10,0,0,0" IsEnabled="False">GET</RadioButton>
+                    <RadioButton x:Name="responsePostRadio" GroupName="httpMethod" IsEnabled="False">POST</RadioButton>
+                </StackPanel>
+                <StackPanel x:Name="responseHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="responseHeadersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="2" Margin="10,25,0,0" AcceptsReturn="True"></TextBox>
+                <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" IsReadOnly="True" AcceptsReturn="True"></TextBox>
 
-                <TextBox x:Name="responseText" Grid.Row="3" Margin="10,25,0,0" AcceptsReturn="True"/>
-                <Button x:Name="backToRequest" Grid.Row="4" HorizontalAlignment="Center" Click="backToRequest_Click">Back</Button>
+                <TextBox x:Name="responseText" Grid.Row="4" Margin="10,25,0,0" AcceptsReturn="True" IsReadOnly="True" />
+                <Button x:Name="backToRequest" Grid.Row="5" HorizontalAlignment="Center" Click="backToRequest_Click">Back</Button>
 
             </Grid>
         </ScrollViewer>

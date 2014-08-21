@@ -43,18 +43,21 @@ namespace Office365RESTExplorerforSites
 
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            await Office365Helper.Logout();
+            await Office365Helper.Logout(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
 
             txtNewSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
             stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+            
         }
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            
-            Uri spSite = new Uri(txtNewSite.Text);
-            await Office365Helper.SignIn(spSite);
+            string[] authResult = await Office365Helper.AcquireAccessToken(txtNewSite.Text);
+            ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
+            ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];
+            ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
             stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Visible;
             stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }

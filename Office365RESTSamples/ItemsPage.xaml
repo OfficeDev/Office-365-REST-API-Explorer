@@ -50,7 +50,7 @@
             SelectionMode="None"
             IsSwipeEnabled="false"
             IsItemClickEnabled="True"
-            ItemClick="ItemView_ItemClick" FlyoutBase.AttachedFlyout="{StaticResource FlyoutSPSite}" Loaded="ItemsPage_Loaded">
+            ItemClick="ItemView_ItemClick" FlyoutBase.AttachedFlyout="{StaticResource FlyoutSPSite}" >
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Grid HorizontalAlignment="Left" Width="250" Height="250">
