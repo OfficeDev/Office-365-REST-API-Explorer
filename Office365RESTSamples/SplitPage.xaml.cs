@@ -38,7 +38,7 @@ namespace Office365RESTExplorerforSites
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
         private HttpWebRequest endpointRequest;
-        private WebResponse endpointResponse;
+        private HttpWebResponse endpointResponse;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -273,11 +273,6 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
-            //TokenCacheItem tokenCacheItem = await Office365Helper.GetTokenFromCache(
-            //                                                                ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString(), 
-            //                                                                ApplicationData.Current.LocalSettings.Values["UserId"].ToString()
-            //                                                                );
-            //tokenCacheItem.AccessToken;
             string accessToken = null;
             bool thereIsAccessToken = false;
 
@@ -291,8 +286,11 @@ namespace Office365RESTExplorerforSites
             {
                 thereIsAccessToken = false;
             }
-            if(!thereIsAccessToken)
+            if (!thereIsAccessToken)
+            {
                 await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
+                //TODO: Refresh the data source
+            }
 
             string method;
             if ((bool)getRadio.IsChecked)
@@ -316,9 +314,6 @@ namespace Office365RESTExplorerforSites
                     case "content-type":
                         endpointRequest.ContentType = header.Value.GetString();
                         break;
-                    case "authorization":
-                        endpointRequest.Headers[header.Key] = "Bearer " + accessToken;
-                        break;
                     default:
                         endpointRequest.Headers[header.Key] = header.Value.GetString();
                         break;
@@ -334,20 +329,28 @@ namespace Office365RESTExplorerforSites
                 Stream newStream = await endpointRequest.GetRequestStreamAsync();
                 newStream.Write(byte1, 0, byte1.Length);
             }
-
+            
+            Stream responseStream;
+            WebHeaderCollection respHeaders;
             try
             {
-                endpointResponse = await endpointRequest.GetResponseAsync();
+                endpointResponse = (HttpWebResponse) await endpointRequest.GetResponseAsync();
+                responseStatusText.Text = endpointResponse.StatusDescription;
+                responseStream = endpointResponse.GetResponseStream();
+                responseUriText.Text = endpointResponse.ResponseUri.AbsoluteUri;
+                respHeaders = endpointResponse.Headers;
             }
             catch (WebException we)
             {
                 //TODO: Need to check for a condition that tells me that the token is invalid.
-                //Office365Helper.ClearTokenCache();
+                // We may need to reset the token
+                responseStatusText.Text = we.Message;
+                responseStream = we.Response.GetResponseStream();
+                responseUriText.Text = we.Response.ResponseUri.AbsoluteUri;
+                respHeaders = we.Response.Headers;
             }
 
             //Process response
-            Stream responseStream = endpointResponse.GetResponseStream();
-
             int responseLength = 100000;
             byte[] responseBytes = new byte[responseLength];
 
@@ -372,19 +375,17 @@ namespace Office365RESTExplorerforSites
             else if (JsonObject.TryParse(responseString, out responseJson))
                 responseText.Text = JsonConvert.SerializeObject(responseJson, Formatting.Indented);
             else
-                responseText.Text = responseString;            
+                responseText.Text = responseString;
             
-            responseUriText.Text = endpointResponse.ResponseUri.AbsoluteUri;
-
-            JsonObject responseHeaders = new JsonObject();
+            JsonObject jsonHeaders = new JsonObject();
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
-            for (int i = 0; i < endpointResponse.Headers.Count; i++)
+            for (int i = 0; i < respHeaders.Count; i++)
             {
-                string key = endpointResponse.Headers.AllKeys[i].ToString();
-                responseHeaders.Add(key, JsonValue.CreateStringValue(endpointResponse.Headers[key]));
+                string key = respHeaders.AllKeys[i].ToString();
+                jsonHeaders.Add(key, JsonValue.CreateStringValue(respHeaders[key]));
             }
-            responseHeadersText.Text = JsonConvert.SerializeObject(responseHeaders, Formatting.Indented);
+            responseHeadersText.Text = JsonConvert.SerializeObject(jsonHeaders, Formatting.Indented);
             
             itemDetail.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             responseViewer.Visibility = Windows.UI.Xaml.Visibility.Visible;

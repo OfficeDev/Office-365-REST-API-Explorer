@@ -27,7 +27,7 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class SampleDataItem
     {
-        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, Uri endpoint, String method, JsonObject headers, IJsonValue body)
+        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, Uri endpoint, String method, JsonObject headers, JsonObject body)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
@@ -57,7 +57,7 @@ namespace Office365RESTExplorerforSites.Data
         public bool Get { get; private set; }
         public bool Post { get; private set; }
         public JsonObject Headers { get; private set; }
-        public IJsonValue Body { get; private set; }
+        public JsonObject Body { get; private set; }
 
         public override string ToString()
         {
@@ -160,6 +160,9 @@ namespace Office365RESTExplorerforSites.Data
                     string serviceResourceId = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
                     string endPoint = itemObject["EndPoint"].GetString();
                     Uri endPointUri = new Uri(new Uri(serviceResourceId), endPoint);
+
+                    JsonObject jsonHeaders = itemObject["Headers"].GetObject();
+                    jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
                     
                     group.Items.Add(new SampleDataItem(itemObject["UniqueId"].GetString(),
                                                        itemObject["Title"].GetString(),
@@ -167,8 +170,8 @@ namespace Office365RESTExplorerforSites.Data
                                                        itemObject["ImagePath"].GetString(),
                                                        endPointUri,
                                                        itemObject["Method"].GetString(),
-                                                       itemObject["Headers"].GetObject(),
-                                                       itemObject["Body"]
+                                                       jsonHeaders,
+                                                       itemObject["Body"].GetObject()
                                                        ));
                 }
                 this.Groups.Add(group);
@@ -180,7 +183,8 @@ namespace Office365RESTExplorerforSites.Data
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return JsonConvert.SerializeObject(value, Formatting.Indented);
+            JsonObject jsonObject = (JsonObject)value;
+            return JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

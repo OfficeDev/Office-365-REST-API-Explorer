@@ -13,7 +13,7 @@
                 "EndPoint": "_api/web/lists",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose"
                 },
@@ -36,7 +36,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/items",
                 "Method": "GET",
                 "Headers": {
-                    "Authorization": "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically too",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose"
                 },
@@ -50,7 +50,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/Fields",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose"
                 },
@@ -73,7 +73,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + AccessToken -- The app retrieves the access token when it issues the HTTP request. The app will overwrite this header. Content-length is set automatically",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose",
                     "IF-MATCH": "*",
@@ -97,7 +97,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/items",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose"
                 },
@@ -116,7 +116,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/items(1)",
                 "Method": "GET",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose"
                 },
@@ -130,7 +130,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/items(1)",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose",
                     "IF-MATCH": "*",
@@ -151,7 +151,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('My List')/items(1)",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "application/json;odata=verbose",
                     "IF-MATCH": "*",
@@ -175,11 +175,11 @@
                 "EndPoint": "_api/web/lists/getbytitle('Documents')/rootfolder/files/add(overwrite=true,url='MyFile.txt')",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "text/plain"
                 },
-                "Body": "Lorem ipsum"
+                "Body": { "data": "You can also send plain text." }
             },
             {
                 "UniqueId": "Group-3-Item-2",
@@ -189,7 +189,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('Documents')/rootfolder/files('MyFile.txt')/$value",
                 "Method": "GET",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose"
                 },
                 "Body": { }
@@ -202,12 +202,12 @@
                 "EndPoint": "_api/web/lists/getbytitle('Documents')/rootfolder/files('MyFile.txt')/$value",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "Content-type": "text/plain",
                     "X-HTTP-Method": "PUT"
                 },
-                "Body": "Lorem ipsum and more..."
+                "Body": { "data": "Lorem ipsum and more..." }
             },
             {
                 "UniqueId": "Group-3-Item-4",
@@ -217,7 +217,7 @@
                 "EndPoint": "_api/web/lists/getbytitle('Documents')/rootfolder/files('MyFile.txt')",
                 "Method": "POST",
                 "Headers": {
-                    "Authorization": "Bearer + Accesstoken",
+                    "Authorization": "Bearer ",
                     "Accept": "application/json;odata=verbose",
                     "X-HTTP-Method": "DELETE"
                 },

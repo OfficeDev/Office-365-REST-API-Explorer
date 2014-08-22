@@ -105,7 +105,7 @@
             DataContext="{Binding SelectedItem, ElementName=itemListView}"
             d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
             HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-            ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled"
+            ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" 
             ScrollViewer.ZoomMode="Disabled">
 
             <Grid x:Name="itemDetailGrid" Margin="0,60,0,50">
@@ -122,10 +122,12 @@
                     <TextBlock x:Name="requestTitle" Text="Request" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="itemSubtitle" Margin="0,0,0,20" Text="Type the request details, then choose Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <StackPanel x:Name="requestDetailPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="endpointLabel" Margin="10,0,0,0" Text="EndPoint:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBox x:Name="endpointText" MinWidth="400" Margin="10,0,0,0" Text="{Binding EndPoint, Mode=TwoWay}"></TextBox>
+                <StackPanel x:Name="requestDetailPanel" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
+                    <TextBlock x:Name="endpointLabel" Margin="10,0,0,0" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
+                <TextBox x:Name="endpointText" Grid.Row="1" Margin="10,25,0,0" Text="{Binding EndPoint, Mode=OneWay}"></TextBox>
+                
+                
                 <StackPanel x:Name="methodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock x:Name="methodLabel" Margin="10,0,0,0" Text="Method:" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <RadioButton x:Name="getRadio" GroupName="httpMethod" Margin="10,0,0,0" IsChecked="{Binding Get, Mode=OneWay}">GET</RadioButton>
@@ -138,7 +140,7 @@
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="bodyText" Margin="10,25,0,0" Text="{Binding Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="bodyText"  Margin="10,25,0,0" Text="{Binding Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
                 <Button x:Name="sendRequest" Grid.Row="5" HorizontalAlignment="Center" Click="sendRequest_Click">Send</Button>
             </Grid>
         </ScrollViewer>
@@ -171,10 +173,9 @@
                     <TextBlock x:Name="responseUriLabel" Margin="10,0,0,0" Text="Response URI:" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <TextBox x:Name="responseUriText" MinWidth="400" Margin="10,0,0,0" IsReadOnly="True" ></TextBox>
                 </StackPanel>
-                <StackPanel x:Name="responseMethodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="responseMethodLabel" Margin="10,0,0,0" Text="Method:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <RadioButton x:Name="responseGetRadio" GroupName="httpMethod" Margin="10,0,0,0" IsEnabled="False">GET</RadioButton>
-                    <RadioButton x:Name="responsePostRadio" GroupName="httpMethod" IsEnabled="False">POST</RadioButton>
+                <StackPanel x:Name="responseStatusPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="responseStatusLabel" Margin="10,0,0,0" Text="Status:" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBox x:Name="responseStatusText" Margin="10,0,0,0" IsReadOnly="True" ></TextBox>
                 </StackPanel>
                 <StackPanel x:Name="responseHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="responseHeadersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
