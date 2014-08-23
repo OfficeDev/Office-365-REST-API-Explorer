@@ -48,8 +48,6 @@ namespace Office365RESTExplorerforSites
             txtNewSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
             stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Visible;
-
-            
         }
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)

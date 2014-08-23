@@ -77,6 +77,10 @@ namespace Office365RESTExplorerforSites
             this.InvalidateVisualState();
 
             this.Unloaded += SplitPage_Unloaded;
+
+            //TODO: Change this to databind
+            this.SPSiteLink.NavigateUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
+            this.SPSiteLink.Content = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
         }
 
         /// <summary>
@@ -289,16 +293,25 @@ namespace Office365RESTExplorerforSites
             if (!thereIsAccessToken)
             {
                 await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-                //TODO: Refresh the data source
+                //Refresh the data source, the Authorization header in the data surce needs to be updated
+                SampleDataGroup currentGroup = (SampleDataGroup)this.defaultViewModel["Group"];
+                SampleDataGroup newGroup = await SampleDataSource.GetGroupAsync(currentGroup.UniqueId);
+                this.DefaultViewModel["Group"] = newGroup;
+                this.DefaultViewModel["Items"] = newGroup.Items;
             }
 
             string method;
+
             if ((bool)getRadio.IsChecked)
                 method = "GET";
-            else
+            else if ((bool)postRadio.IsChecked)
                 method = "POST";
+            else
+                throw new Exception("None of the Method radio buttons is checked.");
 
-            endpointRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(endpointText.Text);
+            //Validate that the resulting URI is well-formed.
+            Uri endpointUri = new Uri(new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString()), endpointText.Text);
+            endpointRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(endpointUri.AbsoluteUri);
 
             endpointRequest.Method = method;
 
@@ -331,14 +344,14 @@ namespace Office365RESTExplorerforSites
             }
             
             Stream responseStream;
-            WebHeaderCollection respHeaders;
+            WebHeaderCollection responseHeaders;
             try
             {
                 endpointResponse = (HttpWebResponse) await endpointRequest.GetResponseAsync();
-                responseStatusText.Text = endpointResponse.StatusDescription;
+                responseStatusText.Text = (int)endpointResponse.StatusCode + " - " + endpointResponse.StatusDescription;
                 responseStream = endpointResponse.GetResponseStream();
                 responseUriText.Text = endpointResponse.ResponseUri.AbsoluteUri;
-                respHeaders = endpointResponse.Headers;
+                responseHeaders = endpointResponse.Headers;
             }
             catch (WebException we)
             {
@@ -347,7 +360,7 @@ namespace Office365RESTExplorerforSites
                 responseStatusText.Text = we.Message;
                 responseStream = we.Response.GetResponseStream();
                 responseUriText.Text = we.Response.ResponseUri.AbsoluteUri;
-                respHeaders = we.Response.Headers;
+                responseHeaders = we.Response.Headers;
             }
 
             //Process response
@@ -380,10 +393,10 @@ namespace Office365RESTExplorerforSites
             JsonObject jsonHeaders = new JsonObject();
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
-            for (int i = 0; i < respHeaders.Count; i++)
+            for (int i = 0; i < responseHeaders.Count; i++)
             {
-                string key = respHeaders.AllKeys[i].ToString();
-                jsonHeaders.Add(key, JsonValue.CreateStringValue(respHeaders[key]));
+                string key = responseHeaders.AllKeys[i].ToString();
+                jsonHeaders.Add(key, JsonValue.CreateStringValue(responseHeaders[key]));
             }
             responseHeadersText.Text = JsonConvert.SerializeObject(jsonHeaders, Formatting.Indented);
             

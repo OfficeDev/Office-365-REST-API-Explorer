@@ -17,9 +17,6 @@
             x:Name="itemsViewSource"
             Source="{Binding Items}"
             d:Source="{Binding Groups, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"/>
-        <Flyout x:Key="FlyoutSPSite">
-            <Grid Height="100" Width="100"/>
-        </Flyout>
     </Page.Resources>
 
     <!--
@@ -50,7 +47,7 @@
             SelectionMode="None"
             IsSwipeEnabled="false"
             IsItemClickEnabled="True"
-            ItemClick="ItemView_ItemClick" FlyoutBase.AttachedFlyout="{StaticResource FlyoutSPSite}" >
+            ItemClick="ItemView_ItemClick" >
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Grid HorizontalAlignment="Left" Width="250" Height="250">

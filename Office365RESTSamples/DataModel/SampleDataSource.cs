@@ -27,14 +27,14 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class SampleDataItem
     {
-        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, Uri endpoint, String method, JsonObject headers, JsonObject body)
+        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, string apiUrl, String method, JsonObject headers, JsonObject body)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
             this.Subtitle = subtitle;
             this.ImagePath = imagePath;
 
-            this.EndPoint = endpoint;
+            this.ApiUrl = apiUrl;
 
             this.Get = false;
             this.Post = false;
@@ -53,7 +53,7 @@ namespace Office365RESTExplorerforSites.Data
         public string Title { get; private set; }
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
-        public Uri EndPoint { get; private set; }
+        public string ApiUrl { get; private set; }
         public bool Get { get; private set; }
         public bool Post { get; private set; }
         public JsonObject Headers { get; private set; }
@@ -70,12 +70,14 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class SampleDataGroup
     {
-        public SampleDataGroup(String uniqueId, String title, String subtitle, String imagePath)
+        public SampleDataGroup(String uniqueId, String title, String subtitle, String imagePath, String moreInfoText, String moreInfoUri)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
             this.Subtitle = subtitle;
             this.ImagePath = imagePath;
+            this.MoreInfoText = moreInfoText;
+            this.MoreInfoUri = moreInfoUri;
             this.Items = new ObservableCollection<SampleDataItem>();
         }
 
@@ -83,6 +85,8 @@ namespace Office365RESTExplorerforSites.Data
         public string Title { get; private set; }
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
+        public string MoreInfoUri { get; private set; }
+        public string MoreInfoText { get; private set; }
         public ObservableCollection<SampleDataItem> Items { get; private set; }
 
         public override string ToString()
@@ -150,17 +154,15 @@ namespace Office365RESTExplorerforSites.Data
                 SampleDataGroup group = new SampleDataGroup(groupObject["UniqueId"].GetString(),
                                                             groupObject["Title"].GetString(),
                                                             groupObject["Subtitle"].GetString(),
-                                                            groupObject["ImagePath"].GetString());
+                                                            groupObject["ImagePath"].GetString(),
+                                                            groupObject["MoreInfoText"].GetString(),
+                                                            groupObject["MoreInfoUri"].GetString());
 
                 foreach (JsonValue itemValue in groupObject["Items"].GetArray())
                 {
                     JsonObject itemObject = itemValue.GetObject();
 
-                    //Validate that we build a well-formed URI
-                    string serviceResourceId = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
-                    string endPoint = itemObject["EndPoint"].GetString();
-                    Uri endPointUri = new Uri(new Uri(serviceResourceId), endPoint);
-
+                    //Add the Authorization header with the access token.
                     JsonObject jsonHeaders = itemObject["Headers"].GetObject();
                     jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
                     
@@ -168,7 +170,7 @@ namespace Office365RESTExplorerforSites.Data
                                                        itemObject["Title"].GetString(),
                                                        itemObject["Subtitle"].GetString(),
                                                        itemObject["ImagePath"].GetString(),
-                                                       endPointUri,
+                                                       itemObject["ApiUrl"].GetString(),
                                                        itemObject["Method"].GetString(),
                                                        jsonHeaders,
                                                        itemObject["Body"].GetObject()

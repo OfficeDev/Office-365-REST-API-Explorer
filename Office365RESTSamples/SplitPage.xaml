@@ -37,6 +37,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="primaryColumn" Width="420"/>
@@ -94,6 +95,15 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
+        
+        <!-- More information about REST -->
+        <StackPanel Grid.Row="2" Margin="20,0,0,0" Orientation="Vertical">
+            <TextBlock x:Name="moreInfo" Style="{StaticResource BodyTextBlockStyle}" >
+                Want to know more about this REST API?
+            </TextBlock>
+            <HyperlinkButton NavigateUri="{Binding MoreInfoUri}" 
+                             Content="{Binding MoreInfoText}"></HyperlinkButton>
+        </StackPanel>
 
         <!-- Details for selected item -->
         <ScrollViewer
@@ -122,16 +132,20 @@
                     <TextBlock x:Name="requestTitle" Text="Request" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="itemSubtitle" Margin="0,0,0,20" Text="Type the request details, then choose Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <StackPanel x:Name="requestDetailPanel" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
-                    <TextBlock x:Name="endpointLabel" Margin="10,0,0,0" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <StackPanel x:Name="requestDetailPanel" Margin="10,0,0,0" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
+                    <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <HyperlinkButton x:Name="SPSiteLink">LinkToTheSite</HyperlinkButton>
+                        <TextBox x:Name="endpointText" Text="{Binding ApiUrl, Mode=OneWay}"></TextBox>
+                    </StackPanel>
                 </StackPanel>
-                <TextBox x:Name="endpointText" Grid.Row="1" Margin="10,25,0,0" Text="{Binding EndPoint, Mode=OneWay}"></TextBox>
+                
                 
                 
                 <StackPanel x:Name="methodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock x:Name="methodLabel" Margin="10,0,0,0" Text="Method:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <RadioButton x:Name="getRadio" GroupName="httpMethod" Margin="10,0,0,0" IsChecked="{Binding Get, Mode=OneWay}">GET</RadioButton>
-                    <RadioButton x:Name="postRadio" GroupName="httpMethod" IsChecked="{Binding Post, Mode=OneWay}">POST</RadioButton>
+                    <RadioButton x:Name="getRadio" Margin="10,0,0,0" IsChecked="{Binding Get, Mode=OneWay}" GroupName="HttpMethod" >GET</RadioButton>
+                    <RadioButton x:Name="postRadio" IsChecked="{Binding Post, Mode=OneWay}" GroupName="HttpMethod">POST</RadioButton>
                 </StackPanel>
                 <StackPanel x:Name="requestHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="headersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
