@@ -28,17 +28,11 @@ namespace Office365RESTExplorerforSites.Data
         {
             this.ApiUrl = apiUrl;
 
-            if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) == 0)
-            {
-                this.Method = false;
-            }
-
-            else if (String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) == 0)
-            {
-                this.Method = true;
-            }
-            else
+            // Validate that the method is either "GET" or "POST"
+            if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
                 throw new ArgumentOutOfRangeException("The HTTP method can only be GET or POST.");
+            else
+                this.Method = String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) == 0;
 
             this.Headers = headers;
             this.Body = body;
@@ -47,7 +41,6 @@ namespace Office365RESTExplorerforSites.Data
         public string ApiUrl { get; private set; }
         public JsonObject Headers { get; private set; }
         public JsonObject Body { get; private set; }
-
         public bool Method { get; private set; }
     }
     /// <summary>
