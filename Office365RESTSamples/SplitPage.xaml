@@ -79,9 +79,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border Width="64" Height="64">
-                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill"  AutomationProperties.Name="{Binding Title}"/>
-                        </Border>
+                        <Image Source="{Binding ImagePath}" Width="64" Height="64" AutomationProperties.Name="{Binding Title}"/>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
                             <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" MaxHeight="40"/>
                             <TextBlock Text="{Binding Subtitle}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="NoWrap"/>
