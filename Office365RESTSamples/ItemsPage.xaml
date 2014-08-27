@@ -17,7 +17,7 @@
         <CollectionViewSource
             x:Name="itemsViewSource"
             Source="{Binding Items}"
-            d:Source="{Binding Groups, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"/>
+            d:Source="{Binding Groups, Source={d:DesignData Source=/DataModel/InitialData.json, Type=data:DataSource}}"/>
     </Page.Resources>
 
     <!--

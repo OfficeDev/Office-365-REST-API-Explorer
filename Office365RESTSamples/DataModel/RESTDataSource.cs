@@ -22,26 +22,21 @@ using Windows.UI.Xaml.Data;
 
 namespace Office365RESTExplorerforSites.Data
 {
-    /// <summary>
-    /// Generic item data model.
-    /// </summary>
-    public class DataItem
+    public class RequestItem
     {
-        public DataItem(String uniqueId, String title, String subtitle, String imagePath, string apiUrl, String method, JsonObject headers, JsonObject body)
+        public RequestItem(string apiUrl, string method, JsonObject headers, JsonObject body)
         {
-            this.UniqueId = uniqueId;
-            this.Title = title;
-            this.Subtitle = subtitle;
-            this.ImagePath = imagePath;
-
             this.ApiUrl = apiUrl;
 
-            this.Get = false;
-            this.Post = false;
             if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) == 0)
-                this.Get = true;
+            {
+                this.Method = false;
+            }
+
             else if (String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) == 0)
-                this.Post = true;
+            {
+                this.Method = true;
+            }
             else
                 throw new ArgumentOutOfRangeException("The HTTP method can only be GET or POST.");
 
@@ -49,15 +44,31 @@ namespace Office365RESTExplorerforSites.Data
             this.Body = body;
         }
 
+        public string ApiUrl { get; private set; }
+        public JsonObject Headers { get; private set; }
+        public JsonObject Body { get; private set; }
+
+        public bool Method { get; private set; }
+    }
+    /// <summary>
+    /// Generic item data model.
+    /// </summary>
+    public class DataItem
+    {
+        public DataItem(String uniqueId, String title, String subtitle, String imagePath)
+        {
+            this.UniqueId = uniqueId;
+            this.Title = title;
+            this.Subtitle = subtitle;
+            this.ImagePath = imagePath;
+        }
+
         public string UniqueId { get; private set; }
         public string Title { get; private set; }
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
         public string ApiUrl { get; private set; }
-        public bool? Get { get; private set; }
-        public bool? Post { get; private set; }
-        public JsonObject Headers { get; private set; }
-        public JsonObject Body { get; private set; }
+        public RequestItem Request { get; set; }
 
         public override string ToString()
         {
@@ -141,7 +152,7 @@ namespace Office365RESTExplorerforSites.Data
             if (this._groups.Count != 0)
                 return;
 
-            Uri dataUri = new Uri("ms-appx:///DataModel/SampleData.json");
+            Uri dataUri = new Uri("ms-appx:///DataModel/InitialData.json");
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
@@ -161,20 +172,32 @@ namespace Office365RESTExplorerforSites.Data
                 foreach (JsonValue itemValue in groupObject["Items"].GetArray())
                 {
                     JsonObject itemObject = itemValue.GetObject();
+                    JsonObject requestObject = itemObject["Request"].GetObject();
 
                     //Add the Authorization header with the access token.
-                    JsonObject jsonHeaders = itemObject["Headers"].GetObject();
+                    JsonObject jsonHeaders = requestObject["Headers"].GetObject();
                     jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
-                    
-                    group.Items.Add(new DataItem(itemObject["UniqueId"].GetString(),
+
+                    //Create the request object
+                    RequestItem request = new RequestItem(requestObject["ApiUrl"].GetString(),
+                                                       requestObject["Method"].GetString(),
+                                                       jsonHeaders,
+                                                       requestObject["Body"].GetObject());
+
+                    //Create the data item object
+                    DataItem item = new DataItem(itemObject["UniqueId"].GetString(),
                                                        itemObject["Title"].GetString(),
                                                        itemObject["Subtitle"].GetString(),
-                                                       itemObject["ImagePath"].GetString(),
-                                                       itemObject["ApiUrl"].GetString(),
-                                                       itemObject["Method"].GetString(),
-                                                       jsonHeaders,
-                                                       itemObject["Body"].GetObject()
-                                                       ));
+                                                       itemObject["ImagePath"].GetString()
+                                                       );
+
+                    // Add the request object to the item
+                    item.Request = request;
+                    
+                    //Add the item to the group
+                    group.Items.Add(item);
+
+
                 }
                 this.Groups.Add(group);
             }

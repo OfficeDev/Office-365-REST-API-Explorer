@@ -17,7 +17,7 @@
         <CollectionViewSource
             x:Name="itemsViewSource"
             Source="{Binding Items}"
-            d:Source="{Binding Groups[0].Items, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"/>
+            d:Source="{Binding Groups[0].Items, Source={d:DesignData Source=/DataModel/InitialData.json, Type=data:DataSource}}"/>
     </Page.Resources>
 
     <!--
@@ -27,7 +27,7 @@
     -->
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
         DataContext="{Binding Group}"
-        d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}">
+        d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/InitialData.json, Type=data:DataSource}}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -116,7 +116,7 @@
             Grid.RowSpan="2"
             Padding="60,0,66,0"
             DataContext="{Binding SelectedItem, ElementName=itemListView}"
-            d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"
+            d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/InitialData.json, Type=data:DataSource}}"
             HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
             ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" 
             ScrollViewer.ZoomMode="Disabled">
@@ -140,25 +140,23 @@
                     <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <HyperlinkButton x:Name="SPSiteLink">LinkToTheSite</HyperlinkButton>
-                        <TextBox x:Name="endpointText" Text="{Binding ApiUrl, Mode=OneWay}"></TextBox>
+                        <TextBox x:Name="endpointText" Text="{Binding Request.ApiUrl, Mode=OneWay}"></TextBox>
                     </StackPanel>
                 </StackPanel>
                 
                 
                 
                 <StackPanel x:Name="methodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="methodLabel" Margin="10,0,0,0" Text="Method:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <RadioButton x:Name="getRadio" Margin="10,0,0,0" IsChecked="{Binding Get, Mode=OneWay}" GroupName="HttpMethod" >GET</RadioButton>
-                    <RadioButton x:Name="postRadio" IsChecked="{Binding Post, Mode=OneWay}" GroupName="HttpMethod">POST</RadioButton>
+                    <ToggleSwitch Name="methodSwitch" Header="Method" OffContent="GET" OnContent="POST" IsOn="{Binding Request.Method}" />
                 </StackPanel>
                 <StackPanel x:Name="requestHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="headersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="headersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Headers, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" AcceptsReturn="True"></TextBox>
+                <TextBox x:Name="headersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Request.Headers, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" AcceptsReturn="True"></TextBox>
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="bodyText"  Margin="10,25,0,0" Text="{Binding Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="bodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
             </Grid>
         </ScrollViewer>
 

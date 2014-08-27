@@ -196,13 +196,6 @@ namespace Office365RESTExplorerforSites
 
             itemDetail.Visibility = Windows.UI.Xaml.Visibility.Visible;
             responseViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-            // TODO: The radio buttons are loosing the binding to the data source.
-            if (itemsViewSource.View.CurrentItem != null) { 
-                dynamic currentItem = itemsViewSource.View.CurrentItem;
-                getRadio.IsChecked = currentItem.Get;
-                postRadio.IsChecked = currentItem.Post;
-            }
         }
 
         private bool CanGoBack()
@@ -309,12 +302,7 @@ namespace Office365RESTExplorerforSites
 
             string method;
 
-            if ((bool)getRadio.IsChecked)
-                method = "GET";
-            else if ((bool)postRadio.IsChecked)
-                method = "POST";
-            else
-                throw new Exception("None of the Method radio buttons is checked.");
+            method = methodSwitch.IsOn ? "POST" : "GET";
 
             //Validate that the resulting URI is well-formed.
             Uri endpointUri = new Uri(new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString()), endpointText.Text);
