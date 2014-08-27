@@ -148,6 +148,9 @@
     <Content Include="Assets\ListItemUpdate.png" />
     <Content Include="Assets\ListRead.png" />
     <Content Include="Assets\ListUpdate.png" />
+    <Content Include="Assets\Square310x310Logo.scale-100.png" />
+    <Content Include="Assets\Square70x70Logo.scale-100.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-100.png" />
     <Content Include="DataModel\SampleData.json" />
     <None Include="packages.config" />
   </ItemGroup>
