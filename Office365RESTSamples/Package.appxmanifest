@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Office365RESTExplorerforSites.App">
-      <m2:VisualElements DisplayName="Office365RESTExplorerforSites" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Office365RESTExplorerforSites" ForegroundText="light" BackgroundColor="#464646" ToastCapable="false">
+      <m2:VisualElements DisplayName="Office365RESTAPIforSites" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Office 365 REST API forSites" ForegroundText="light" BackgroundColor="#464646" ToastCapable="false">
         <m2:SplashScreen Image="Assets\SplashScreen.png" />
         <m2:ApplicationView MinWidth="default" />
       </m2:VisualElements>

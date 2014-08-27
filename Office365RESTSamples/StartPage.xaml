@@ -5,13 +5,14 @@
     xmlns:local="using:Office365RESTExplorerforSites"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding Windows.Storage.ApplicationData.Current.LocalSettings}"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"  Loaded="Grid_Loaded">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
         <TextBlock x:Name="pageTitle" Style="{StaticResource HeaderTextBlockStyle}" 
     		IsHitTestVisible="false" TextWrapping="WrapWholeWords"  VerticalAlignment="Bottom" Margin="0,320,0,20" Height="89" TextAlignment="Center" FontFamily="Global User Interface" FontSize="48">
-    		Office 365 REST API Explorer
+    		Office 365 REST API 
             <LineBreak/>
             for Sites
         </TextBlock>

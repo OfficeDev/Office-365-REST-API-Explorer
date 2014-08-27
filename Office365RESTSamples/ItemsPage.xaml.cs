@@ -30,6 +30,7 @@ namespace Office365RESTExplorerforSites
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private const int MinimumWidthForSupportingTwoPanes = 768;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -70,7 +71,7 @@ namespace Office365RESTExplorerforSites
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
+            var sampleDataGroups = await DataSource.GetGroupsAsync();
             this.DefaultViewModel["Items"] = sampleDataGroups;
         }
 
@@ -84,7 +85,7 @@ namespace Office365RESTExplorerforSites
         {
             // Navigate to the appropriate destination page, configuring the new page
             // by passing required information as a navigation parameter
-            var groupId = ((SampleDataGroup)e.ClickedItem).UniqueId;
+            var groupId = ((DataGroup)e.ClickedItem).UniqueId;
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
 
@@ -114,6 +115,14 @@ namespace Office365RESTExplorerforSites
         private void ItemsPage_Loaded(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void pageRoot_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize.Width < MinimumWidthForSupportingTwoPanes)
+                Description.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            else
+                Description.Visibility = Windows.UI.Xaml.Visibility.Visible;
         }
     }
 }

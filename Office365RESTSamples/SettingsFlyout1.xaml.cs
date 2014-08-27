@@ -45,6 +45,10 @@ namespace Office365RESTExplorerforSites
         {
             await Office365Helper.Logout(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
 
+            ApplicationData.Current.LocalSettings.Values.Remove("UserAccount");
+            ApplicationData.Current.LocalSettings.Values.Remove("UserId");
+            ApplicationData.Current.LocalSettings.Values.Remove("AccessToken");
+
             txtNewSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
             stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Visible;
@@ -53,6 +57,7 @@ namespace Office365RESTExplorerforSites
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
             string[] authResult = await Office365Helper.AcquireAccessToken(txtNewSite.Text);
+            
             ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
             ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];
             ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];

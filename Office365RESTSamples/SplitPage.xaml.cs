@@ -104,7 +104,7 @@ namespace Office365RESTExplorerforSites
         /// session.  The state will be null the first time a page is visited.</param>
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            var group = await SampleDataSource.GetGroupAsync((String)e.NavigationParameter);
+            var group = await DataSource.GetGroupAsync((String)e.NavigationParameter);
             this.DefaultViewModel["Group"] = group;
             this.DefaultViewModel["Items"] = group.Items;
 
@@ -123,7 +123,7 @@ namespace Office365RESTExplorerforSites
                 // Restore the previously saved state associated with this page
                 if (e.PageState.ContainsKey("SelectedItem") && this.itemsViewSource.View != null)
                 {
-                    var selectedItem = await SampleDataSource.GetItemAsync((String)e.PageState["SelectedItem"]);
+                    var selectedItem = await DataSource.GetItemAsync((String)e.PageState["SelectedItem"]);
                     this.itemsViewSource.View.MoveCurrentTo(selectedItem);
                 }
             }
@@ -144,7 +144,7 @@ namespace Office365RESTExplorerforSites
         {
             if (this.itemsViewSource.View != null)
             {
-                var selectedItem = (Data.SampleDataItem)this.itemsViewSource.View.CurrentItem;
+                var selectedItem = (Data.DataItem)this.itemsViewSource.View.CurrentItem;
                 if (selectedItem != null) e.PageState["SelectedItem"] = selectedItem.UniqueId;
             }
         }
@@ -196,6 +196,13 @@ namespace Office365RESTExplorerforSites
 
             itemDetail.Visibility = Windows.UI.Xaml.Visibility.Visible;
             responseViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+
+            // TODO: The radio buttons are loosing the binding to the data source.
+            if (itemsViewSource.View.CurrentItem != null) { 
+                dynamic currentItem = itemsViewSource.View.CurrentItem;
+                getRadio.IsChecked = currentItem.Get;
+                postRadio.IsChecked = currentItem.Post;
+            }
         }
 
         private bool CanGoBack()
@@ -294,8 +301,8 @@ namespace Office365RESTExplorerforSites
             {
                 await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
                 //Refresh the data source, the Authorization header in the data surce needs to be updated
-                SampleDataGroup currentGroup = (SampleDataGroup)this.defaultViewModel["Group"];
-                SampleDataGroup newGroup = await SampleDataSource.GetGroupAsync(currentGroup.UniqueId);
+                DataGroup currentGroup = (DataGroup)this.defaultViewModel["Group"];
+                DataGroup newGroup = await DataSource.GetGroupAsync(currentGroup.UniqueId);
                 this.DefaultViewModel["Group"] = newGroup;
                 this.DefaultViewModel["Items"] = newGroup.Items;
             }
@@ -403,13 +410,5 @@ namespace Office365RESTExplorerforSites
             itemDetail.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             responseViewer.Visibility = Windows.UI.Xaml.Visibility.Visible;
         }
-
-        private void backToRequest_Click(object sender, RoutedEventArgs e)
-        {
-            itemDetail.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-        }
-
-        
     }
 }

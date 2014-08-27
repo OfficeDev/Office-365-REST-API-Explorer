@@ -9,14 +9,15 @@
     xmlns:common="using:Office365RESTExplorerforSites.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    SizeChanged="pageRoot_SizeChanged">
 
     <Page.Resources>
         <!-- Collection of items displayed by this page -->
         <CollectionViewSource
             x:Name="itemsViewSource"
             Source="{Binding Items}"
-            d:Source="{Binding Groups, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"/>
+            d:Source="{Binding Groups, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"/>
     </Page.Resources>
 
     <!--
@@ -34,6 +35,10 @@
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- Horizontal scrolling grid -->
         <GridView
@@ -42,6 +47,7 @@
             AutomationProperties.Name="Items"
             TabIndex="1"
             Grid.RowSpan="2"
+            Grid.Column="0"
             Padding="116,136,116,46"
             ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
             SelectionMode="None"
@@ -63,8 +69,17 @@
             </GridView.ItemTemplate>
         </GridView>
 
+        <RichTextBlock Name="Description" Grid.Column="2" Grid.RowSpan="2" Style="{StaticResource BodyRichTextBlockStyle}" Margin="40,0,40,0" VerticalAlignment="Center">
+            <Paragraph>SharePoint 2013 introduces a Representational State Transfer (REST) service that is comparable to the existing SharePoint client object models. Now, developers can interact remotely with SharePoint data by using any technology that supports REST web requests. This means that developers can perform Create, Read, Update, and Delete (CRUD) operations from their apps for SharePoint, solutions, and client applications, using REST web technologies and standard Open Data Protocol (OData) syntax.</Paragraph>
+            <Paragraph>For more information, see
+                <Hyperlink NavigateUri="http://aka.ms/F1lnxt">Get started with the SharePoint 2013 REST service</Hyperlink>.
+                <LineBreak/>
+            </Paragraph>
+            <Paragraph>Use this app to try the REST endpoints that you need to use in your apps. Select the tiles to the left to find CRUD operations for the selected item.</Paragraph>
+        </RichTextBlock>
+
         <!-- Back button and page title -->
-        <Grid>
+        <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
@@ -75,7 +90,7 @@
                         AutomationProperties.Name="Back"
                         AutomationProperties.AutomationId="BackButton"
                         AutomationProperties.ItemType="Navigation Button"/>
-            <TextBlock x:Name="pageTitle" Text="Office 365 REST API Explorer for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+            <TextBlock x:Name="pageTitle" Text="Office 365 REST API for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>
     </Grid>

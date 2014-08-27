@@ -40,7 +40,6 @@ static class Office365Helper
                 if (authResult.Status == AuthenticationStatus.Success)
                 {
                     // We have a new token, the user explicitly authenticated
-                    //return authResult;
                     return new string[] { authResult.AccessToken, authResult.UserInfo.UniqueId, authResult.UserInfo.DisplayableId};
                 }
                 else
@@ -69,7 +68,6 @@ static class Office365Helper
                 if (authResult.Status == AuthenticationStatus.Success)
                 {
                     // We have a new token from the refresh flow
-                    //return authResult;
                     return new string[] { authResult.AccessToken, authResult.UserInfo.UniqueId, authResult.UserInfo.DisplayableId };
                 }
                 else
@@ -86,7 +84,6 @@ static class Office365Helper
                 if (authResult.Status == AuthenticationStatus.Success)
                 {
                     // We have a new token from the refresh flow
-                    //return authResult;
                     return new string[] { authResult.AccessToken, tci.UniqueId, tci.DisplayableId };
                 }
                 else
@@ -98,7 +95,6 @@ static class Office365Helper
                     if (authResult.Status == AuthenticationStatus.Success)
                     {
                         // We have a new token, the user explicitly authenticated
-                        //return authResult;
                         return new string[] { authResult.AccessToken, authResult.UserInfo.UniqueId, authResult.UserInfo.DisplayableId };
                     }
                     else
@@ -109,10 +105,8 @@ static class Office365Helper
             }
             
             // Most of the cases should be handled here. The user has a valid token in cache.
-            //ResourceDiscoveryResult dcr1 = await _discoveryContext.DiscoverResourceAsync(ServiceResourceId);
             _userIdObj = new UserIdentifier(_discoveryContext.LastLoggedInUser, UserIdentifierType.UniqueId);
             
-            //authResult = await _discoveryContext.AuthenticationContext.AcquireTokenAsync(ServiceResourceId, _discoveryContext.AppIdentity.ClientId, PromptBehavior.Auto, _userIdObj);
             return new string[] { tci.AccessToken, tci.UniqueId, tci.DisplayableId };
         }
 
@@ -124,10 +118,6 @@ static class Office365Helper
             }
             await _discoveryContext.LogoutAsync(UserIdentifier);
             _discoveryContext.AuthenticationContext.TokenCache.Clear();
-            ApplicationData.Current.LocalSettings.Values.Remove("UserAccount");
-            ApplicationData.Current.LocalSettings.Values.Remove("UserId");
-            ApplicationData.Current.LocalSettings.Values.Remove("AccessToken");
-            //ApplicationData.Current.LocalSettings.Values.Remove("ServiceResourceId");
         }
 
         public static async Task<TokenCacheItem> GetTokenFromCache(string ServiceResourceId, string UserIdentifier)

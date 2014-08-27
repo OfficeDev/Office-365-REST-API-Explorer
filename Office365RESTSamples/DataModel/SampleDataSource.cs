@@ -25,9 +25,9 @@ namespace Office365RESTExplorerforSites.Data
     /// <summary>
     /// Generic item data model.
     /// </summary>
-    public class SampleDataItem
+    public class DataItem
     {
-        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, string apiUrl, String method, JsonObject headers, JsonObject body)
+        public DataItem(String uniqueId, String title, String subtitle, String imagePath, string apiUrl, String method, JsonObject headers, JsonObject body)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
@@ -54,8 +54,8 @@ namespace Office365RESTExplorerforSites.Data
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
         public string ApiUrl { get; private set; }
-        public bool Get { get; private set; }
-        public bool Post { get; private set; }
+        public bool? Get { get; private set; }
+        public bool? Post { get; private set; }
         public JsonObject Headers { get; private set; }
         public JsonObject Body { get; private set; }
 
@@ -68,9 +68,9 @@ namespace Office365RESTExplorerforSites.Data
     /// <summary>
     /// Generic group data model.
     /// </summary>
-    public class SampleDataGroup
+    public class DataGroup
     {
-        public SampleDataGroup(String uniqueId, String title, String subtitle, String imagePath, String moreInfoText, String moreInfoUri)
+        public DataGroup(String uniqueId, String title, String subtitle, String imagePath, String moreInfoText, String moreInfoUri)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
@@ -78,7 +78,7 @@ namespace Office365RESTExplorerforSites.Data
             this.ImagePath = imagePath;
             this.MoreInfoText = moreInfoText;
             this.MoreInfoUri = moreInfoUri;
-            this.Items = new ObservableCollection<SampleDataItem>();
+            this.Items = new ObservableCollection<DataItem>();
         }
 
         public string UniqueId { get; private set; }
@@ -87,7 +87,7 @@ namespace Office365RESTExplorerforSites.Data
         public string ImagePath { get; private set; }
         public string MoreInfoUri { get; private set; }
         public string MoreInfoText { get; private set; }
-        public ObservableCollection<SampleDataItem> Items { get; private set; }
+        public ObservableCollection<DataItem> Items { get; private set; }
 
         public override string ToString()
         {
@@ -101,24 +101,24 @@ namespace Office365RESTExplorerforSites.Data
     /// SampleDataSource initializes with data read from a static json file included in the 
     /// project.  This provides sample data at both design-time and run-time.
     /// </summary>
-    public sealed class SampleDataSource
+    public sealed class DataSource
     {
-        private static SampleDataSource _sampleDataSource = new SampleDataSource();
+        private static DataSource _sampleDataSource = new DataSource();
 
-        private ObservableCollection<SampleDataGroup> _groups = new ObservableCollection<SampleDataGroup>();
-        public ObservableCollection<SampleDataGroup> Groups
+        private ObservableCollection<DataGroup> _groups = new ObservableCollection<DataGroup>();
+        public ObservableCollection<DataGroup> Groups
         {
             get { return this._groups; }
         }
 
-        public static async Task<IEnumerable<SampleDataGroup>> GetGroupsAsync()
+        public static async Task<IEnumerable<DataGroup>> GetGroupsAsync()
         {
             await _sampleDataSource.GetSampleDataAsync();
 
             return _sampleDataSource.Groups;
         }
 
-        public static async Task<SampleDataGroup> GetGroupAsync(string uniqueId)
+        public static async Task<DataGroup> GetGroupAsync(string uniqueId)
         {
             await _sampleDataSource.GetSampleDataAsync();
             // Simple linear search is acceptable for small data sets
@@ -127,7 +127,7 @@ namespace Office365RESTExplorerforSites.Data
             return null;
         }
 
-        public static async Task<SampleDataItem> GetItemAsync(string uniqueId)
+        public static async Task<DataItem> GetItemAsync(string uniqueId)
         {
             await _sampleDataSource.GetSampleDataAsync();
             // Simple linear search is acceptable for small data sets
@@ -151,7 +151,7 @@ namespace Office365RESTExplorerforSites.Data
             foreach (JsonValue groupValue in jsonArray)
             {
                 JsonObject groupObject = groupValue.GetObject();
-                SampleDataGroup group = new SampleDataGroup(groupObject["UniqueId"].GetString(),
+                DataGroup group = new DataGroup(groupObject["UniqueId"].GetString(),
                                                             groupObject["Title"].GetString(),
                                                             groupObject["Subtitle"].GetString(),
                                                             groupObject["ImagePath"].GetString(),
@@ -166,7 +166,7 @@ namespace Office365RESTExplorerforSites.Data
                     JsonObject jsonHeaders = itemObject["Headers"].GetObject();
                     jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
                     
-                    group.Items.Add(new SampleDataItem(itemObject["UniqueId"].GetString(),
+                    group.Items.Add(new DataItem(itemObject["UniqueId"].GetString(),
                                                        itemObject["Title"].GetString(),
                                                        itemObject["Subtitle"].GetString(),
                                                        itemObject["ImagePath"].GetString(),

@@ -17,7 +17,7 @@
         <CollectionViewSource
             x:Name="itemsViewSource"
             Source="{Binding Items}"
-            d:Source="{Binding Groups[0].Items, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"/>
+            d:Source="{Binding Groups[0].Items, Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"/>
     </Page.Resources>
 
     <!--
@@ -27,7 +27,7 @@
     -->
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
         DataContext="{Binding Group}"
-        d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
+        d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -97,13 +97,16 @@
         </ListView>
         
         <!-- More information about REST -->
-        <StackPanel Grid.Row="2" Margin="20,0,0,0" Orientation="Vertical">
+        <StackPanel Grid.Row="2" Grid.Column="0" Margin="20,0,0,0" Orientation="Vertical">
             <TextBlock x:Name="moreInfo" Style="{StaticResource BodyTextBlockStyle}" >
                 Want to know more about this REST API?
             </TextBlock>
             <HyperlinkButton NavigateUri="{Binding MoreInfoUri}" 
                              Content="{Binding MoreInfoText}"></HyperlinkButton>
         </StackPanel>
+
+        <!-- The send and back buttons -->
+        <Button x:Name="sendRequest" Grid.Row="2" Grid.Column="1" Margin="150,0,0,0"  HorizontalAlignment="Center" Click="sendRequest_Click">Send</Button>
 
         <!-- Details for selected item -->
         <ScrollViewer
@@ -113,7 +116,7 @@
             Grid.RowSpan="2"
             Padding="60,0,66,0"
             DataContext="{Binding SelectedItem, ElementName=itemListView}"
-            d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
+            d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:DataSource}}"
             HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
             ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" 
             ScrollViewer.ZoomMode="Disabled">
@@ -125,13 +128,14 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="200"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel x:Name="itemDetailTitlePanel" Grid.Row="0">
                     <TextBlock x:Name="requestTitle" Text="Request" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="itemSubtitle" Margin="0,0,0,20" Text="Type the request details, then choose Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
+                
+                
                 <StackPanel x:Name="requestDetailPanel" Margin="10,0,0,0" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -155,7 +159,6 @@
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
                 <TextBox x:Name="bodyText"  Margin="10,25,0,0" Text="{Binding Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
-                <Button x:Name="sendRequest" Grid.Row="5" HorizontalAlignment="Center" Click="sendRequest_Click">Send</Button>
             </Grid>
         </ScrollViewer>
 
@@ -176,10 +179,9 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="200"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel x:Name="responseTitlePanel" Grid.Row="0">
+                <StackPanel x:Name="responseTitlePanel" Grid.Row="0" Visibility="Collapsed">
                     <TextBlock x:Name="responseTitle" Text="Response" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="responseSubtitle" Margin="0,0,0,20" Text="Here is the response, you can also go back to the request" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
@@ -197,8 +199,6 @@
                 <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" IsReadOnly="True" AcceptsReturn="True"></TextBox>
 
                 <TextBox x:Name="responseText" Grid.Row="4" Margin="10,25,0,0" AcceptsReturn="True" IsReadOnly="True" />
-                <Button x:Name="backToRequest" Grid.Row="5" HorizontalAlignment="Center" Click="backToRequest_Click">Back</Button>
-
             </Grid>
         </ScrollViewer>
         <VisualStateManager.VisualStateGroups>
@@ -214,6 +214,9 @@
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemDetail" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="responseViewer" Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemListView" Storyboard.TargetProperty="Padding">

@@ -96,7 +96,7 @@
             {
                 "UniqueId": "Group-2-Item-1",
                 "Title": "Create a list item",
-                "Subtitle": "Create an item in the \"MyList\" list",
+                "Subtitle": "Create an item in the \"My List\" list",
                 "ImagePath": "Assets/ListItemCreate.png",
                 "ApiUrl": "_api/web/lists/getbytitle('My List')/items",
                 "Method": "POST",
@@ -115,7 +115,7 @@
             {
                 "UniqueId": "Group-2-Item-2",
                 "Title": "Read a list item",
-                "Subtitle": "Read a specific item from the \"MyList\" list",
+                "Subtitle": "Read a specific item from \"My List\"",
                 "ImagePath": "Assets/ListItemRead.png",
                 "ApiUrl": "_api/web/lists/getbytitle('My List')/items(1)",
                 "Method": "GET",
