@@ -133,18 +133,14 @@
                 <StackPanel x:Name="itemDetailTitlePanel" Grid.Row="0">
                     <TextBlock x:Name="requestTitle" Text="Request" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     <TextBlock x:Name="requestSubtitle" Margin="0,0,0,20" Text="Type the request details, then click Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    
-                    <TextBlock x:Name="responseTitle" Text="Response" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}" Visibility="Collapsed"/>
-                    <TextBlock x:Name="responseSubtitle" Margin="0,0,0,20" Text="Here is the response data" Style="{StaticResource SubtitleTextBlockStyle}" Visibility="Collapsed"/>
                 </StackPanel>
                 
                 <StackPanel x:Name="requestDetailPanel" Margin="10,0,0,0" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBlock x:Name="responseStatusLabel" Text="Status" Style="{StaticResource SubtitleTextBlockStyle}" Visibility="Collapsed"/>
                     <StackPanel x:Name="endpointPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <HyperlinkButton x:Name="SPSiteLink">LinkToTheSite</HyperlinkButton>
                         <TextBox x:Name="endpointText" Text="{Binding Request.ApiUrl, Mode=TwoWay}"></TextBox>
-                        <TextBox x:Name="responseStatusText" IsReadOnly="True" Text="{Binding Response.Status}" Visibility="Collapsed"></TextBox>
+                        <TextBox x:Name="responseStatusText" Text="{Binding Response.Status}" Visibility="Collapsed"></TextBox>
                     </StackPanel>
                 </StackPanel>
                 
@@ -175,7 +171,7 @@
                             <DiscreteObjectKeyFrame KeyTime="0" Value="*"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="secondaryColumn" Storyboard.TargetProperty="Width">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                            <DiscreteObjectKeyFrame KeyTime="5" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemDetail" Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
@@ -217,6 +213,50 @@
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="endpointPanel" Storyboard.TargetProperty="Orientation">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Vertical"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="SwitchStates">
+                <VisualState x:Name="RequestView" />
+                <VisualState x:Name="ResponseView">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="requestTitle" Storyboard.TargetProperty="Text">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Response"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="requestSubtitle" Storyboard.TargetProperty="Text">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Here is the response data"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="endpointLabel" Storyboard.TargetProperty="Text">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Status"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="endpointText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="responseStatusText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="methodSwitch" Storyboard.TargetProperty="IsEnabled">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="false"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="requestHeadersText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="responseHeadersText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="requestBodyText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="responseBodyText" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="backToRequest" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="sendRequest" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>

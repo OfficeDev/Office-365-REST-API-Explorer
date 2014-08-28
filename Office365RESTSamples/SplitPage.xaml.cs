@@ -191,7 +191,7 @@ namespace Office365RESTExplorerforSites
             // opposite effect.
             if (this.UsingLogicalPageNavigation()) this.InvalidateVisualState();
 
-            DisplayRequest();
+            VisualStateManager.GoToState(this, "RequestView", false);            
         }
 
         private bool CanGoBack()
@@ -278,52 +278,14 @@ namespace Office365RESTExplorerforSites
             item = (DataItem)itemsViewSource.View.CurrentItem;
             item.Response = await DataSource.GetResponseAsync(item.Request);
 
-            DisplayResponse();
+            // Show the Response UI
+            VisualStateManager.GoToState(this, "ResponseView", true);
         }
 
         private void backToRequest_Click(object sender, RoutedEventArgs e)
         {
-            DisplayRequest();
-        }
-
-        private void DisplayRequest()
-        {
-            requestTitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            requestSubtitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            endpointLabel.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            endpointText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            requestHeadersText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            requestBodyText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseTitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseSubtitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseStatusLabel.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseStatusText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseHeadersText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseBodyText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            sendRequest.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            backToRequest.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-            methodSwitch.IsEnabled = true;
-        }
-
-        private void DisplayResponse()
-        {
-            requestTitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            requestSubtitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            endpointLabel.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            endpointText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            requestHeadersText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            requestBodyText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseTitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseSubtitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseStatusLabel.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseStatusText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseHeadersText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseBodyText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            sendRequest.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            backToRequest.Visibility = Windows.UI.Xaml.Visibility.Visible;
-
-            methodSwitch.IsEnabled = false;
+            // Show the Request UI
+            VisualStateManager.GoToState(this, "RequestView", true);
         }
     }
 }
