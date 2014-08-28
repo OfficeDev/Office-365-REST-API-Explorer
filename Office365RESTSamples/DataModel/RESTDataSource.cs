@@ -267,23 +267,11 @@ namespace Office365RESTExplorerforSites.Data
                 responseHeaders = we.Response.Headers;
             }
 
-            //Process response body
-            int responseLength = 100000;
-            byte[] responseBytes = new byte[responseLength];
-
-            for (int i = 0; responseStream.CanRead; i++)
+            string responseString = string.Empty;
+            using (StreamReader reader = new StreamReader(responseStream, Encoding.UTF8))
             {
-                byte[] buffer = new byte[1];
-                await responseStream.ReadAsync(buffer, 0, 1);
-
-                if (buffer[0] != 0)
-                    responseBytes[i] = buffer[0];
-                else
-                    break;
+                responseString = await reader.ReadToEndAsync();
             }
-
-            string responseString = Encoding.UTF8.GetString(responseBytes, 0, responseLength);
-            responseString = responseString.Substring(0, responseString.IndexOf('\0'));
 
             if (!String.IsNullOrEmpty(responseString))
             {
