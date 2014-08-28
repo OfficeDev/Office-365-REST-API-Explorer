@@ -55,7 +55,7 @@ namespace Office365RESTExplorerforSites
                     sf.Show();
                 });
 
-            args.Request.ApplicationCommands.Add(generalCommand);    
+            args.Request.ApplicationCommands.Add(generalCommand);
         }
 
         /// <summary>
@@ -111,7 +111,11 @@ namespace Office365RESTExplorerforSites
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(StartPage), e.Arguments);
+                bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
+                if(configured)
+                    rootFrame.Navigate(typeof(ItemsPage), e.Arguments);
+                else
+                    rootFrame.Navigate(typeof(StartPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Office365RESTExplorerforSites.Common;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -33,27 +34,17 @@ namespace Office365RESTExplorerforSites
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            String[] authResult = await Office365Helper.AcquireAccessToken(spSite.Text);
+            String[] authResult = await Office365Helper.AcquireAccessTokenAsync(spSite.Text);
 
             ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSite.Text;
             ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
-            ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; //authResult.UserInfo.UniqueId;
-            ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2]; //authResult.UserInfo.DisplayableId;
+            ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; 
+            ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
+
             this.Frame.Navigate(typeof(ItemsPage));
         }
 
-        private async void Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-            bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
+       
 
-            if (configured)
-            {
-                String[] authResult = await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-                ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
-                ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; //authResult.UserInfo.UniqueId;
-                ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2]; //authResult.UserInfo.DisplayableId;
-                this.Frame.Navigate(typeof(ItemsPage));
-            }
-        }
     }
 }

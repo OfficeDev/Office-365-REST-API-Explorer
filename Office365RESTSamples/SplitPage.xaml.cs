@@ -37,9 +37,6 @@ namespace Office365RESTExplorerforSites
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        private HttpWebRequest endpointRequest;
-        private HttpWebResponse endpointResponse;
-
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
         /// process lifetime management
@@ -194,8 +191,7 @@ namespace Office365RESTExplorerforSites
             // opposite effect.
             if (this.UsingLogicalPageNavigation()) this.InvalidateVisualState();
 
-            itemDetail.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            responseViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            DisplayRequest();
         }
 
         private bool CanGoBack()
@@ -277,126 +273,57 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
-            string accessToken = null;
-            bool thereIsAccessToken = false;
+            // Create a new response item and assign it to the current item in the data source
+            dynamic item;
+            item = (DataItem)itemsViewSource.View.CurrentItem;
+            item.Response = await DataSource.GetResponseAsync(item.Request);
 
-            // Validate that I have an access token
-            try
-            {
-                accessToken = ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString();
-                thereIsAccessToken = true;
-            }
-            catch (NullReferenceException)
-            {
-                thereIsAccessToken = false;
-            }
-            if (!thereIsAccessToken)
-            {
-                await Office365Helper.AcquireAccessToken(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-                //Refresh the data source, the Authorization header in the data surce needs to be updated
-                DataGroup currentGroup = (DataGroup)this.defaultViewModel["Group"];
-                DataGroup newGroup = await DataSource.GetGroupAsync(currentGroup.UniqueId);
-                this.DefaultViewModel["Group"] = newGroup;
-                this.DefaultViewModel["Items"] = newGroup.Items;
-            }
+            DisplayResponse();
+        }
 
-            string method;
+        private void backToRequest_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayRequest();
+        }
 
-            method = methodSwitch.IsOn ? "POST" : "GET";
+        private void DisplayRequest()
+        {
+            requestTitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            requestSubtitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            endpointLabel.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            endpointText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            requestHeadersText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            requestBodyText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseTitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseSubtitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseStatusLabel.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseStatusText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseHeadersText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseBodyText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            sendRequest.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            backToRequest.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-            //Validate that the resulting URI is well-formed.
-            Uri endpointUri = new Uri(new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString()), endpointText.Text);
-            endpointRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(endpointUri.AbsoluteUri);
+            methodSwitch.IsEnabled = true;
+        }
 
-            endpointRequest.Method = method;
+        private void DisplayResponse()
+        {
+            requestTitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            requestSubtitle.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            endpointLabel.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            endpointText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            requestHeadersText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            requestBodyText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            responseTitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseSubtitle.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseStatusLabel.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseStatusText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseHeadersText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            responseBodyText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            sendRequest.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            backToRequest.Visibility = Windows.UI.Xaml.Visibility.Visible;
 
-            JsonObject headers = JsonObject.Parse(headersText.Text);
-
-            foreach (KeyValuePair<string, IJsonValue> header in headers)
-            {
-                switch (header.Key.ToLower())
-                {
-                    case "accept":
-                        endpointRequest.Accept = header.Value.GetString();
-                        break;
-                    case "content-type":
-                        endpointRequest.ContentType = header.Value.GetString();
-                        break;
-                    default:
-                        endpointRequest.Headers[header.Key] = header.Value.GetString();
-                        break;
-                }
-            }
-
-            //Request body, only if method is POST
-            if (String.Compare(method, "post", StringComparison.CurrentCultureIgnoreCase) == 0)
-            {
-                string postData = bodyText.Text;
-                UTF8Encoding encoding = new UTF8Encoding();
-                byte[] byte1 = encoding.GetBytes(postData);
-                Stream newStream = await endpointRequest.GetRequestStreamAsync();
-                newStream.Write(byte1, 0, byte1.Length);
-            }
-            
-            Stream responseStream;
-            WebHeaderCollection responseHeaders;
-            try
-            {
-                endpointResponse = (HttpWebResponse) await endpointRequest.GetResponseAsync();
-                responseStatusText.Text = (int)endpointResponse.StatusCode + " - " + endpointResponse.StatusDescription;
-                responseStream = endpointResponse.GetResponseStream();
-                responseUriText.Text = endpointResponse.ResponseUri.AbsoluteUri;
-                responseHeaders = endpointResponse.Headers;
-            }
-            catch (WebException we)
-            {
-                //TODO: Need to check for a condition that tells me that the token is invalid.
-                // We may need to reset the token
-                responseStatusText.Text = we.Message;
-                responseStream = we.Response.GetResponseStream();
-                responseUriText.Text = we.Response.ResponseUri.AbsoluteUri;
-                responseHeaders = we.Response.Headers;
-            }
-
-            //Process response
-            int responseLength = 100000;
-            byte[] responseBytes = new byte[responseLength];
-
-            //TODO: Can I just do  responseStream.Flush(); await responseStream.ReadAsync(responseBytes, 0, responseLength); Or perhaps pass the stream to a StreamReader or something?
-            for (int i = 0; responseStream.CanRead; i++)
-            {
-                byte[] buffer = new byte[1];
-                await responseStream.ReadAsync(buffer, 0, 1);
-
-                if (buffer[0] != 0)
-                    responseBytes[i] = buffer[0];
-                else
-                    break;
-            }
-
-            string responseString = Encoding.UTF8.GetString(responseBytes, 0, responseLength);
-            responseString = responseString.Substring(0, responseString.IndexOf('\0'));
-
-            JsonObject responseJson;
-            if (String.IsNullOrEmpty(responseString))
-                responseJson = new JsonObject();
-            else if (JsonObject.TryParse(responseString, out responseJson))
-                responseText.Text = JsonConvert.SerializeObject(responseJson, Formatting.Indented);
-            else
-                responseText.Text = responseString;
-            
-            JsonObject jsonHeaders = new JsonObject();
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.Formatting = Formatting.Indented;
-            for (int i = 0; i < responseHeaders.Count; i++)
-            {
-                string key = responseHeaders.AllKeys[i].ToString();
-                jsonHeaders.Add(key, JsonValue.CreateStringValue(responseHeaders[key]));
-            }
-            responseHeadersText.Text = JsonConvert.SerializeObject(jsonHeaders, Formatting.Indented);
-            
-            itemDetail.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            responseViewer.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            methodSwitch.IsEnabled = false;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Office365RESTExplorerforSites
 
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            await Office365Helper.Logout(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
+            await Office365Helper.LogoutAsync(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
 
             ApplicationData.Current.LocalSettings.Values.Remove("UserAccount");
             ApplicationData.Current.LocalSettings.Values.Remove("UserId");
@@ -56,7 +56,7 @@ namespace Office365RESTExplorerforSites
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            string[] authResult = await Office365Helper.AcquireAccessToken(txtNewSite.Text);
+            string[] authResult = await Office365Helper.AcquireAccessTokenAsync(txtNewSite.Text);
             
             ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
             ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];

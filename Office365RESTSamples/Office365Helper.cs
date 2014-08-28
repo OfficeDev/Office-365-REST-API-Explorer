@@ -13,7 +13,7 @@ static class Office365Helper
     {
         private static DiscoveryContext _discoveryContext;
 
-        public static async Task<String[]> AcquireAccessToken(string ServiceResourceId)
+        public static async Task<String[]> AcquireAccessTokenAsync(string ServiceResourceId)
         {
             UserIdentifier _userIdObj;
             AuthenticationResult authResult = null;
@@ -50,7 +50,7 @@ static class Office365Helper
 
             try
             {
-                tci = await GetTokenFromCache(ServiceResourceId, _discoveryContext.LastLoggedInUser);
+                tci = await GetTokenFromCacheAsync(ServiceResourceId, _discoveryContext.LastLoggedInUser);
                 tokenInCache = true;
             }
             catch (KeyNotFoundException)
@@ -110,7 +110,7 @@ static class Office365Helper
             return new string[] { tci.AccessToken, tci.UniqueId, tci.DisplayableId };
         }
 
-        public static async Task Logout(string UserIdentifier)
+        public static async Task LogoutAsync(string UserIdentifier)
         {
             if (_discoveryContext == null)
             {
@@ -120,7 +120,7 @@ static class Office365Helper
             _discoveryContext.AuthenticationContext.TokenCache.Clear();
         }
 
-        public static async Task<TokenCacheItem> GetTokenFromCache(string ServiceResourceId, string UserIdentifier)
+        public static async Task<TokenCacheItem> GetTokenFromCacheAsync(string ServiceResourceId, string UserIdentifier)
         {
             Uri serviceResourceId = new Uri(ServiceResourceId);
 
@@ -142,7 +142,7 @@ static class Office365Helper
             throw new KeyNotFoundException("The token was not found in the cache.");
         }
 
-        public static async void ClearTokenCache()
+        public static async void ClearTokenCacheAsync()
         {
             if (_discoveryContext == null)
             {

@@ -100,9 +100,33 @@ namespace Office365RESTExplorerforSites
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+
+            //If I came here from the Get Started experience I don't want to have a back button
+            if(this.Frame.BackStackDepth == 1)
+            {
+                PageStackEntry entry = this.Frame.BackStack[0];
+                if(entry.SourcePageType.Equals(typeof(StartPage)))
+                    this.Frame.BackStack.Remove(entry);
+            }
+
+            // If the navigation mode is not Back, the user just started the app
+            // Check if we have tokens
+            if (e.NavigationMode != NavigationMode.Back)
+            {
+                bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
+
+                if (configured)
+                {
+                    String[] authResult = await Office365Helper.AcquireAccessTokenAsync(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
+                    ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
+                    ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];
+                    ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
+                }
+            }
+            
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -112,17 +136,33 @@ namespace Office365RESTExplorerforSites
 
         #endregion
 
-        private void ItemsPage_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void pageRoot_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (e.NewSize.Width < MinimumWidthForSupportingTwoPanes)
+            // If the window resizes go to the visual state that works for the width
+            //VisualStateManager.GoToState(this, DetermineVisualState(), false);
+            if(Window.Current.Bounds.Width < MinimumWidthForSupportingTwoPanes)
+            {
+                secondaryColumn.Width = new GridLength(0);
                 Description.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
             else
+            {
+                secondaryColumn.Width = new GridLength(1, GridUnitType.Star);
                 Description.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Invoked to determine the name of the visual state that corresponds to an application
+        /// view state.
+        /// </summary>
+        /// <returns>The name of the desired visual state.  This is the same as the name of the
+        /// view state except when there is a selected item in portrait and snapped views where
+        /// this additional logical page is represented by adding a suffix of _Detail.</returns>
+        private string DetermineVisualState()
+        {
+            //If the width is less than the supported minimum reurn SinglePane
+            return Window.Current.Bounds.Width < MinimumWidthForSupportingTwoPanes ? "PrimaryView" : "SinglePane";
         }
     }
 }

@@ -13,6 +13,7 @@
 
     <Page.Resources>
         <data:JsonObjectConverter x:Key="JsonObjectConverter"/>
+        <data:MethodConverter x:Key="MethodConverter"/>
         <!-- Collection of items displayed by this page -->
         <CollectionViewSource
             x:Name="itemsViewSource"
@@ -104,7 +105,8 @@
         </StackPanel>
 
         <!-- The send and back buttons -->
-        <Button x:Name="sendRequest" Grid.Row="2" Grid.Column="1" Margin="150,0,0,0"  HorizontalAlignment="Center" Click="sendRequest_Click">Send</Button>
+        <Button x:Name="sendRequest" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Click="sendRequest_Click">Send</Button>
+        <Button x:Name="backToRequest" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Click="backToRequest_Click" Visibility="Collapsed">Back</Button>
 
         <!-- Details for selected item -->
         <ScrollViewer
@@ -130,73 +132,39 @@
 
                 <StackPanel x:Name="itemDetailTitlePanel" Grid.Row="0">
                     <TextBlock x:Name="requestTitle" Text="Request" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                    <TextBlock x:Name="itemSubtitle" Margin="0,0,0,20" Text="Type the request details, then choose Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Name="requestSubtitle" Margin="0,0,0,20" Text="Type the request details, then click Send" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    
+                    <TextBlock x:Name="responseTitle" Text="Response" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}" Visibility="Collapsed"/>
+                    <TextBlock x:Name="responseSubtitle" Margin="0,0,0,20" Text="Here is the response data" Style="{StaticResource SubtitleTextBlockStyle}" Visibility="Collapsed"/>
                 </StackPanel>
-                
                 
                 <StackPanel x:Name="requestDetailPanel" Margin="10,0,0,0" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="responseStatusLabel" Text="Status" Style="{StaticResource SubtitleTextBlockStyle}" Visibility="Collapsed"/>
+                    <StackPanel x:Name="endpointPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <HyperlinkButton x:Name="SPSiteLink">LinkToTheSite</HyperlinkButton>
-                        <TextBox x:Name="endpointText" Text="{Binding Request.ApiUrl, Mode=OneWay}"></TextBox>
+                        <TextBox x:Name="endpointText" Text="{Binding Request.ApiUrl, Mode=TwoWay}"></TextBox>
+                        <TextBox x:Name="responseStatusText" IsReadOnly="True" Text="{Binding Response.Status}" Visibility="Collapsed"></TextBox>
                     </StackPanel>
                 </StackPanel>
                 
-                
-                
                 <StackPanel x:Name="methodPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <ToggleSwitch Name="methodSwitch" Header="Method" OffContent="GET" OnContent="POST" IsOn="{Binding Request.Method}" />
+                    <ToggleSwitch Name="methodSwitch" Header="Method" OffContent="GET" OnContent="POST" IsOn="{Binding Request.Method, Converter={StaticResource MethodConverter}, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel x:Name="requestHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="headersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="headersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Request.Headers, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" AcceptsReturn="True"></TextBox>
+                <TextBox x:Name="requestHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Request.Headers, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay}" AcceptsReturn="True"></TextBox>
+                <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Response.Headers, Converter={StaticResource JsonObjectConverter}}" IsReadOnly="True" AcceptsReturn="True" Visibility="Collapsed"></TextBox>
+                
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="bodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=OneWay}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="requestBodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="responseBodyText" Grid.Row="4" Margin="10,25,0,0" Text="{Binding Response.Body, Converter={StaticResource JsonObjectConverter}}" AcceptsReturn="True" IsReadOnly="True" Visibility="Collapsed"/>
             </Grid>
         </ScrollViewer>
 
-        <ScrollViewer
-            x:Name="responseViewer"
-            AutomationProperties.AutomationId="ItemDetailScrollViewer"
-            Grid.Column="1"
-            Visibility="Collapsed"
-            Grid.RowSpan="2"
-            Padding="60,0,66,0"
-            HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-            ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled"
-            ScrollViewer.ZoomMode="Disabled">
-            <Grid x:Name="responseGrid" Margin="0,60,0,50">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="200"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <StackPanel x:Name="responseTitlePanel" Grid.Row="0" Visibility="Collapsed">
-                    <TextBlock x:Name="responseTitle" Text="Response" Margin="0,-10,20,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                    <TextBlock x:Name="responseSubtitle" Margin="0,0,0,20" Text="Here is the response, you can also go back to the request" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                </StackPanel>
-                <StackPanel x:Name="responseDetailPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="responseUriLabel" Margin="10,0,0,0" Text="Response URI:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBox x:Name="responseUriText" MinWidth="400" Margin="10,0,0,0" IsReadOnly="True" ></TextBox>
-                </StackPanel>
-                <StackPanel x:Name="responseStatusPanel" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="responseStatusLabel" Margin="10,0,0,0" Text="Status:" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBox x:Name="responseStatusText" Margin="10,0,0,0" IsReadOnly="True" ></TextBox>
-                </StackPanel>
-                <StackPanel x:Name="responseHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
-                    <TextBlock x:Name="responseHeadersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                </StackPanel>
-                <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" IsReadOnly="True" AcceptsReturn="True"></TextBox>
-
-                <TextBox x:Name="responseText" Grid.Row="4" Margin="10,25,0,0" AcceptsReturn="True" IsReadOnly="True" />
-            </Grid>
-        </ScrollViewer>
         <VisualStateManager.VisualStateGroups>
             <!-- Visual states reflect the application's view state -->
             <VisualStateGroup x:Name="ViewStates">
@@ -210,9 +178,6 @@
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemDetail" Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="responseViewer" Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemListView" Storyboard.TargetProperty="Padding">
@@ -249,6 +214,9 @@
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemDetail" Storyboard.TargetProperty="Padding">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="120,0,90,0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="endpointPanel" Storyboard.TargetProperty="Orientation">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Vertical"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>

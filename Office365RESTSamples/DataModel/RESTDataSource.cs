@@ -10,7 +10,11 @@ using Windows.UI.Xaml.Media.Imaging;
 
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Data;
-
+using System.IO;
+using System.Net;
+using System.Text;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model.  The property names chosen coincide with data bindings in the standard item templates.
@@ -22,7 +26,22 @@ using Windows.UI.Xaml.Data;
 
 namespace Office365RESTExplorerforSites.Data
 {
-    public class RequestItem
+    public class ResponseItem
+    {
+        public ResponseItem(string responseUri, string status, JsonObject headers, JsonObject body)
+        {
+            this.ResponseUri = responseUri;
+            this.Status = status;
+            this.Headers = headers;
+            this.Body = body;
+        }
+
+        public string ResponseUri { get; private set; }
+        public JsonObject Headers { get; private set; }
+        public JsonObject Body { get; private set; }
+        public string Status { get; private set; }
+    }
+    public class RequestItem : INotifyPropertyChanged
     {
         public RequestItem(string apiUrl, string method, JsonObject headers, JsonObject body)
         {
@@ -32,22 +51,36 @@ namespace Office365RESTExplorerforSites.Data
             if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
                 throw new ArgumentOutOfRangeException("The HTTP method can only be GET or POST.");
             else
-                this.Method = String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) == 0;
+                this.Method = method;
 
             this.Headers = headers;
             this.Body = body;
         }
 
-        public string ApiUrl { get; private set; }
-        public JsonObject Headers { get; private set; }
-        public JsonObject Body { get; private set; }
-        public bool Method { get; private set; }
+        public string ApiUrl { get; set; }
+        public JsonObject Headers { get; set; }
+        public JsonObject Body { get; set; }
+        public string Method { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // This method is called by the Set accessor of each property. 
+        // The CallerMemberName attribute that is applied to the optional propertyName 
+        // parameter causes the property name of the caller to be substituted as an argument. 
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
     /// <summary>
     /// Generic item data model.
     /// </summary>
-    public class DataItem
+    public class DataItem : INotifyPropertyChanged
     {
+        private ResponseItem response;
         public DataItem(String uniqueId, String title, String subtitle, String imagePath)
         {
             this.UniqueId = uniqueId;
@@ -62,10 +95,40 @@ namespace Office365RESTExplorerforSites.Data
         public string ImagePath { get; private set; }
         public string ApiUrl { get; private set; }
         public RequestItem Request { get; set; }
+        public ResponseItem Response {
+            get
+            {
+                return response;
+            }
+            set
+            {
+                response = value;
+                // Notify the UI that the response property has changed.
+                PropertyChangedEventHandler handler = PropertyChanged;
+                PropertyChangedEventArgs e = new PropertyChangedEventArgs("Response");
+                if (handler != null)
+                {
+                    handler(this, e);
+                }
+            } 
+        }
 
         public override string ToString()
         {
             return this.Title;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // This method is called by the Set accessor of each property. 
+        // The CallerMemberName attribute that is applied to the optional propertyName 
+        // parameter causes the property name of the caller to be substituted as an argument. 
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 
@@ -140,6 +203,103 @@ namespace Office365RESTExplorerforSites.Data
             return null;
         }
 
+        public static async Task<ResponseItem> GetResponseAsync(RequestItem request)
+        {
+            HttpWebRequest endpointRequest;
+
+            //Validate that the resulting URI is well-formed.
+            Uri endpointUri = new Uri(new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString()), request.ApiUrl);
+
+            endpointRequest = (HttpWebRequest)HttpWebRequest.Create(endpointUri.AbsoluteUri);
+            endpointRequest.Method = request.Method;
+
+            // Add the headers to the request
+            foreach (KeyValuePair<string, IJsonValue> header in request.Headers)
+            {
+                // Accept and contenttype are special cases that must be added using the Accept and ContentType properties
+                // All other headers can be added using the Headers collection 
+                switch (header.Key.ToLower())
+                {
+                    case "accept":
+                        endpointRequest.Accept = header.Value.GetString();
+                        break;
+                    case "content-type":
+                        endpointRequest.ContentType = header.Value.GetString();
+                        break;
+                    default:
+                        endpointRequest.Headers[header.Key] = header.Value.GetString();
+                        break;
+                }
+            }
+
+            //Request body, added to the request only if method is POST
+            if (request.Method == "POST")
+            {
+                string postData = request.Body.Stringify();
+                UTF8Encoding encoding = new UTF8Encoding();
+                byte[] byte1 = encoding.GetBytes(postData);
+                System.IO.Stream newStream = await endpointRequest.GetRequestStreamAsync();
+                newStream.Write(byte1, 0, byte1.Length);
+            }
+
+            Stream responseStream;
+            WebHeaderCollection responseHeaders;
+            string status;
+            string responseUri;
+            JsonObject headers = null;
+            JsonObject body = null;
+
+            try
+            {
+                // If the request is succesful we can use the endpointResponse object
+                HttpWebResponse endpointResponse = (HttpWebResponse)await endpointRequest.GetResponseAsync();
+                status = (int)endpointResponse.StatusCode + " - " + endpointResponse.StatusDescription;
+                responseStream = endpointResponse.GetResponseStream();
+                responseUri = endpointResponse.ResponseUri.AbsoluteUri;
+                responseHeaders = endpointResponse.Headers;
+            }
+            catch (WebException we)
+            {
+                // If the request fails, we must use the response stream from the exception
+                status = we.Message;
+                responseStream = we.Response.GetResponseStream();
+                responseUri = we.Response.ResponseUri.AbsoluteUri;
+                responseHeaders = we.Response.Headers;
+            }
+
+            //Process response body
+            int responseLength = 100000;
+            byte[] responseBytes = new byte[responseLength];
+
+            for (int i = 0; responseStream.CanRead; i++)
+            {
+                byte[] buffer = new byte[1];
+                await responseStream.ReadAsync(buffer, 0, 1);
+
+                if (buffer[0] != 0)
+                    responseBytes[i] = buffer[0];
+                else
+                    break;
+            }
+
+            string responseString = Encoding.UTF8.GetString(responseBytes, 0, responseLength);
+            responseString = responseString.Substring(0, responseString.IndexOf('\0'));
+
+            if (!String.IsNullOrEmpty(responseString))
+            {
+                body = JsonObject.Parse(responseString);
+            }
+
+            headers = new JsonObject();
+            for (int i = 0; i < responseHeaders.Count; i++)
+            {
+                string key = responseHeaders.AllKeys[i].ToString();
+                headers.Add(key, JsonValue.CreateStringValue(responseHeaders[key]));
+            }
+
+            return new ResponseItem(responseUri, status, headers, body);
+        }
+
         private async Task GetSampleDataAsync()
         {
             if (this._groups.Count != 0)
@@ -201,14 +361,30 @@ namespace Office365RESTExplorerforSites.Data
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            // Format the json object as a correctly indented string
             JsonObject jsonObject = (JsonObject)value;
             return JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
+            // Convert back from the string to a json object
             String strJson = (String)value;
             return JsonObject.Parse(strJson);
+        }
+    }
+    public class MethodConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            // In the UI POST is true, Get is false
+            return String.Compare((string)value, "POST") == 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            // if the UI returns true, then method is POST, else it is GET
+            return (bool)value ? "POST" : "GET";
         }
     }
 

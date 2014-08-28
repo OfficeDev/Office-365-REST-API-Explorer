@@ -36,8 +36,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition x:Name="primaryColumn" Width="*"/>
+            <ColumnDefinition x:Name="secondaryColumn" Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Horizontal scrolling grid -->
@@ -93,5 +93,6 @@
             <TextBlock x:Name="pageTitle" Text="Office 365 REST API for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>
+
     </Grid>
 </Page>

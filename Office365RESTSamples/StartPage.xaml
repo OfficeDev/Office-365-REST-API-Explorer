@@ -8,7 +8,7 @@
     DataContext="{Binding Windows.Storage.ApplicationData.Current.LocalSettings}"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"  Loaded="Grid_Loaded">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
         <TextBlock x:Name="pageTitle" Style="{StaticResource HeaderTextBlockStyle}" 
     		IsHitTestVisible="false" TextWrapping="WrapWholeWords"  VerticalAlignment="Bottom" Margin="0,320,0,20" Height="89" TextAlignment="Center" FontFamily="Global User Interface" FontSize="48">
