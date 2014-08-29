@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Office365RESTExplorerforSites.Common;
 using Microsoft.Office365.OAuth;
+using Windows.UI.Popups;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -43,36 +44,52 @@ namespace Office365RESTExplorerforSites
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
+            Uri spSiteUri;
+            DiscoveryContext _discoveryContext;
+            AuthenticationResult authResult;
+            MessageDialog errorDialog = null;
+
             try
             {
-                Uri spSiteUri = new Uri(spSite.Text);
-            }
-            catch (FormatException fe)
-            {
+                //Validate that the input is at least a well-formed URI
+                spSiteUri = new Uri(spSite.Text);
 
-            }
-
-
-            DiscoveryContext _discoveryContext = await DiscoveryContext.CreateAsync();
-
-            if (ApplicationData.Current.LocalSettings.Values["UserId"] != null)
-            {
-                await _discoveryContext.LogoutAsync(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
                 _discoveryContext = await DiscoveryContext.CreateAsync();
+
+                var dcr = await _discoveryContext.DiscoverResourceAsync(spSiteUri.AbsoluteUri);
+
+                authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(
+                                                                                spSiteUri.AbsoluteUri,
+                                                                                _discoveryContext.AppIdentity.ClientId,
+                                                                                new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
+                                                                                );
+                if (authResult.Status != AuthenticationStatus.Success)
+                {
+                    throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
+                }
+
+                // Store the relevant data in local settings.
+                ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSiteUri.AbsoluteUri;
+                ApplicationData.Current.LocalSettings.Values["UserId"] = dcr.UserId;
+                ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult.UserInfo.DisplayableId;
+                ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
+
+                this.Frame.Navigate(typeof(ItemsPage));
+            }
+            catch (FormatException)
+            {
+                // Tell the user to correct the site URL
+                errorDialog = new MessageDialog("It looks like the Office 365 site is not a valid URL.", "Invalid Office 365 site");
+            }
+            catch (AuthenticationFailedException)
+            {
+                // Tell the user that the authentication failed
+                errorDialog = new MessageDialog("We couldn't sign you in to your Office 356 site.", "Authentication failed");
             }
 
-            var dcr = await _discoveryContext.DiscoverResourceAsync(spSite.Text);
+            if (errorDialog != null)
+                await errorDialog.ShowAsync();
 
-            AuthenticationResult authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(spSite.Text, _discoveryContext.AppIdentity.ClientId, new Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier(dcr.UserId, Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifierType.UniqueId));
-
-            
-            ApplicationData.Current.LocalSettings.Values["SharePointSiteUrl"] = 
-            ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSite.Text;
-            ApplicationData.Current.LocalSettings.Values["UserId"] = dcr.UserId;
-            ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult.UserInfo.DisplayableId;
-            ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
-
-            this.Frame.Navigate(typeof(ItemsPage));
         }
     }
 }

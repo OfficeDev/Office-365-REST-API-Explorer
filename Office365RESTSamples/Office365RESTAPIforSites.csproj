@@ -109,9 +109,6 @@
     <Compile Include="ItemsPage.xaml.cs">
       <DependentUpon>ItemsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SitesApiSample.cs">
-      <ConnectedServiceReference>Sites</ConnectedServiceReference>
-    </Compile>
     <Compile Include="SplitPage.xaml.cs">
       <DependentUpon>SplitPage.xaml</DependentUpon>
     </Compile>
