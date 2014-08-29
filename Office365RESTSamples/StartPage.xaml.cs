@@ -63,6 +63,8 @@ namespace Office365RESTExplorerforSites
                                                                                 _discoveryContext.AppIdentity.ClientId,
                                                                                 new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
                                                                                 );
+
+
                 if (authResult.Status != AuthenticationStatus.Success)
                 {
                     throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
