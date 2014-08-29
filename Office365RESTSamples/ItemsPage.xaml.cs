@@ -102,14 +102,6 @@ namespace Office365RESTExplorerforSites
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-
-            //If I came here from the Get Started experience the page doesn't need a back button
-            if(this.Frame.BackStackDepth == 1)
-            {
-                PageStackEntry entry = this.Frame.BackStack[0];
-                if(entry.SourcePageType.Equals(typeof(StartPage)))
-                    this.Frame.BackStack.Remove(entry);
-            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

@@ -42,20 +42,6 @@ namespace Office365RESTExplorerforSites
         protected override void OnWindowCreated(WindowCreatedEventArgs args)
         {
             base.OnWindowCreated(args);
-
-            SettingsPane.GetForCurrentView().CommandsRequested += onCommandsRequested;
-        }
-
-        private void onCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
-        {
-            SettingsCommand generalCommand = new SettingsCommand("account", "Account Settings",
-                (handler) =>
-                {
-                    SettingsFlyout1 sf = new SettingsFlyout1();
-                    sf.Show();
-                });
-
-            args.Request.ApplicationCommands.Add(generalCommand);
         }
 
         /// <summary>
@@ -108,14 +94,7 @@ namespace Office365RESTExplorerforSites
             }
             if (rootFrame.Content == null)
             {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
-                if(configured)
-                    rootFrame.Navigate(typeof(ItemsPage), e.Arguments);
-                else
-                    rootFrame.Navigate(typeof(StartPage), e.Arguments);
+                rootFrame.Navigate(typeof(StartPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();
