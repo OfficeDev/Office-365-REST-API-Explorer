@@ -75,9 +75,15 @@ namespace Office365RESTExplorerforSites
 
             this.Unloaded += SplitPage_Unloaded;
 
-            //TODO: Change this to databind
-            this.SPSiteLink.NavigateUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-            this.SPSiteLink.Content = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
+            //TODO: Find out how to do this binding on the markup
+            Binding navigateUriBinding = new Binding();
+            navigateUriBinding.Mode = BindingMode.OneWay;
+            navigateUriBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.SPSiteLink.SetBinding(HyperlinkButton.NavigateUriProperty, navigateUriBinding);
+            Binding hyperlinkContentBinding = new Binding();
+            hyperlinkContentBinding.Mode = BindingMode.OneWay;
+            hyperlinkContentBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.SPSiteLink.SetBinding(HyperlinkButton.ContentProperty, hyperlinkContentBinding);
         }
 
         /// <summary>
@@ -141,7 +147,7 @@ namespace Office365RESTExplorerforSites
         {
             if (this.itemsViewSource.View != null)
             {
-                var selectedItem = (Data.DataItem)this.itemsViewSource.View.CurrentItem;
+                var selectedItem = (DataItem)this.itemsViewSource.View.CurrentItem;
                 if (selectedItem != null) e.PageState["SelectedItem"] = selectedItem.UniqueId;
             }
         }
@@ -274,9 +280,8 @@ namespace Office365RESTExplorerforSites
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
             // Create a new response item and assign it to the current item in the data source
-            dynamic item;
-            item = (DataItem)itemsViewSource.View.CurrentItem;
-            item.Response = await DataSource.GetResponseAsync(item.Request);
+            var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
+            selectedItem.Response = await DataSource.GetResponseAsync(selectedItem.Request);
 
             // Show the Response UI
             VisualStateManager.GoToState(this, "ResponseView", true);
