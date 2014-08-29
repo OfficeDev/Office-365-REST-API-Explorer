@@ -33,21 +33,6 @@
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtUser">
 
             </TextBlock>
-            <Button Content="Logout" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Logout_Click"/>
-
-        </StackPanel>
-
-        <!-- Content Section 2-->
-        <StackPanel Style="{StaticResource SettingsFlyoutSectionStyle}" Name="stkSignedOut" Visibility="Collapsed">
-
-            <!-- Section 1 header -->
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Office 365 site" FontFamily="Global User Interface" />
-
-            <!-- Section 1 body -->
-            <TextBox Name="txtNewSite"></TextBox>
-
-            <Button Content="Sign in" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="SignIn_Click"/>
-
         </StackPanel>
 
         <!-- Define more Content Sections below as necessary -->

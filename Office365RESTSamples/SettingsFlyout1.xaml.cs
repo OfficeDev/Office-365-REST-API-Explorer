@@ -26,43 +26,14 @@ namespace Office365RESTExplorerforSites
         {
             this.InitializeComponent();
 
-            if (ApplicationData.Current.LocalSettings.Values["UserAccount"] != null)
-            {
-                stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                txtSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
-                txtUser.Text = ApplicationData.Current.LocalSettings.Values["UserAccount"].ToString();
-            }
-            else
-            {
-                stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                txtNewSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
-            }
-        }
-
-        private async void Logout_Click(object sender, RoutedEventArgs e)
-        {
-            //await Office365Helper.LogoutAsync(ApplicationData.Current.LocalSettings.Values["UserId"].ToString());
-
-            ApplicationData.Current.LocalSettings.Values.Remove("UserAccount");
-            ApplicationData.Current.LocalSettings.Values.Remove("UserId");
-            ApplicationData.Current.LocalSettings.Values.Remove("AccessToken");
-
-            txtNewSite.Text = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
-            stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Visible;
-        }
-
-        private async void SignIn_Click(object sender, RoutedEventArgs e)
-        {
-            //string[] authResult = await Office365Helper.AcquireAccessTokenAsync(txtNewSite.Text);
-
-            //ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
-            //ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];
-            //ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
-            //stkSignedIn.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            //stkSignedOut.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            Binding serviceResourceIdBinding = new Binding();
+            serviceResourceIdBinding.Mode = BindingMode.OneWay;
+            serviceResourceIdBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.txtSite.SetBinding(TextBlock.TextProperty, serviceResourceIdBinding);
+            Binding userAccountBinding = new Binding();
+            userAccountBinding.Mode = BindingMode.OneWay;
+            userAccountBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.txtUser.SetBinding(TextBlock.TextProperty, userAccountBinding);
         }
     }
 }
