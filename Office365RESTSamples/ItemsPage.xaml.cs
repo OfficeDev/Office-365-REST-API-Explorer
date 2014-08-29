@@ -70,7 +70,6 @@ namespace Office365RESTExplorerforSites
         /// session.  The state will be null the first time a page is visited.</param>
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            // TODO: Create an appropriate data model for your problem domain to replace the sample data
             var sampleDataGroups = await DataSource.GetGroupsAsync();
             this.DefaultViewModel["Items"] = sampleDataGroups;
         }
@@ -100,33 +99,17 @@ namespace Office365RESTExplorerforSites
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
 
-            //If I came here from the Get Started experience I don't want to have a back button
+            //If I came here from the Get Started experience the page doesn't need a back button
             if(this.Frame.BackStackDepth == 1)
             {
                 PageStackEntry entry = this.Frame.BackStack[0];
                 if(entry.SourcePageType.Equals(typeof(StartPage)))
                     this.Frame.BackStack.Remove(entry);
             }
-
-            // If the navigation mode is not Back, the user just started the app
-            // Check if we have tokens
-            if (e.NavigationMode != NavigationMode.Back)
-            {
-                bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
-
-                if (configured)
-                {
-                    String[] authResult = await Office365Helper.AcquireAccessTokenAsync(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-                    ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
-                    ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1];
-                    ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
-                }
-            }
-            
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

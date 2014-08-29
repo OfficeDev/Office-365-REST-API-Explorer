@@ -33,7 +33,7 @@ static class Office365Helper
 
             if (_discoveryContext.LastLoggedInUser == null)
             {
-                // This is the first time the user starts the app. This should be a good place for a Get Started experience.
+                // This is the first time the user starts the app, full sign in
                 ResourceDiscoveryResult dcr = await _discoveryContext.DiscoverResourceAsync(ServiceResourceId);
                 _userIdObj = new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId);
                 authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(ServiceResourceId, _discoveryContext.AppIdentity.ClientId, _userIdObj);
@@ -76,7 +76,7 @@ static class Office365Helper
                 }
             }
 
-            // We have a token!
+            // We have a matching token in the cache, has it expired?
             if (DateTimeOffset.Compare(tci.ExpiresOn, DateTimeOffset.Now) <= 0)
             {
                 // The token has expired go to the refresh flow
@@ -122,8 +122,6 @@ static class Office365Helper
 
         public static async Task<TokenCacheItem> GetTokenFromCacheAsync(string ServiceResourceId, string UserIdentifier)
         {
-            Uri serviceResourceId = new Uri(ServiceResourceId);
-
             if (_discoveryContext == null)
             {
                 _discoveryContext = await DiscoveryContext.CreateAsync();
@@ -133,7 +131,7 @@ static class Office365Helper
 
             foreach (TokenCacheItem item in tci)
             {
-                bool resourceMatches = serviceResourceId.Equals(new Uri(item.Resource));
+                bool resourceMatches = ServiceResourceId.Equals(new Uri(item.Resource));
                 bool userIdMatches = String.Compare(item.UniqueId, UserIdentifier, StringComparison.CurrentCultureIgnoreCase) == 0;
 
                 if (resourceMatches && userIdMatches)
@@ -142,7 +140,7 @@ static class Office365Helper
             throw new KeyNotFoundException("The token was not found in the cache.");
         }
 
-        public static async void ClearTokenCacheAsync()
+        public static async Task ClearTokenCacheAsync()
         {
             if (_discoveryContext == null)
             {

@@ -37,7 +37,6 @@ namespace Office365RESTExplorerforSites
             String[] authResult = await Office365Helper.AcquireAccessTokenAsync(spSite.Text);
 
             ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSite.Text;
-            ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult[0];
             ApplicationData.Current.LocalSettings.Values["UserId"] = authResult[1]; 
             ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult[2];
 

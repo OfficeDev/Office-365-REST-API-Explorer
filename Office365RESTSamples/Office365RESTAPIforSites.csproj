@@ -113,9 +113,6 @@
     <Compile Include="SettingsFlyout1.xaml.cs">
       <DependentUpon>SettingsFlyout1.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SitesApiSample.cs">
-      <ConnectedServiceReference>Sites</ConnectedServiceReference>
-    </Compile>
     <Compile Include="SplitPage.xaml.cs">
       <DependentUpon>SplitPage.xaml</DependentUpon>
     </Compile>
