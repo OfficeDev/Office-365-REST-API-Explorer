@@ -75,6 +75,8 @@ namespace Office365RESTExplorerforSites
                 ApplicationData.Current.LocalSettings.Values["UserId"] = dcr.UserId;
                 ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult.UserInfo.DisplayableId;
                 ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
+                ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;
+                ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"] = authResult.ExpiresOn;
 
                 this.Frame.Navigate(typeof(ItemsPage));
             }
