@@ -17,6 +17,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
+using Windows.UI.Popups;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Microsoft.Office365.OAuth;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -99,9 +104,62 @@ namespace Office365RESTExplorerforSites
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+
+            // If the access token has expired, renew it and update the data source
+            if (DateTimeOffset.Compare((DateTimeOffset)ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"], DateTimeOffset.Now) <= 0)
+            {
+                DiscoveryContext _discoveryContext;
+                AuthenticationResult authResult;
+                MessageDialog errorDialog = null;
+                
+
+                try
+                {
+                    Uri spSiteUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
+                    _discoveryContext = await DiscoveryContext.CreateAsync();
+
+                    var dcr = await _discoveryContext.DiscoverResourceAsync(spSiteUri.AbsoluteUri);
+
+                    authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(
+                                                                                    spSiteUri.AbsoluteUri,
+                                                                                    _discoveryContext.AppIdentity.ClientId,
+                                                                                    new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
+                                                                                    );
+
+
+                    if (authResult.Status != AuthenticationStatus.Success)
+                    {
+                        throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
+                    }
+
+                    // Store the relevant data in local settings.
+                    ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
+                    ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;
+                    ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"] = authResult.ExpiresOn;
+
+                    this.Frame.Navigate(typeof(ItemsPage));
+                }
+                catch (FormatException)
+                {
+                    // Tell the user to correct the site URL
+                    errorDialog = new MessageDialog("It looks like the Office 365 site is not a valid URL.", "Invalid Office 365 site");
+                }
+                catch (AuthenticationFailedException)
+                {
+                    // Tell the user that the authentication failed
+                    errorDialog = new MessageDialog("We couldn't sign you in to your Office 356 site.", "Authentication failed");
+                }
+
+                if (errorDialog != null)
+                    await errorDialog.ShowAsync();
+
+                //Update the data source
+                var sampleDataGroups = await DataSource.GetGroupsAsync();
+                this.DefaultViewModel["Items"] = sampleDataGroups;
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
