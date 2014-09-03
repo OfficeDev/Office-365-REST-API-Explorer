@@ -75,7 +75,7 @@ namespace Office365RESTExplorerforSites
 
             this.Unloaded += SplitPage_Unloaded;
 
-            //TODO: Find out how to do this binding on the markup
+            //Data bind the controls to local settings
             Binding navigateUriBinding = new Binding();
             navigateUriBinding.Mode = BindingMode.OneWay;
             navigateUriBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
