@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
+using Office365RESTExplorerforSites.Common;
 
 namespace Office365RESTExplorerforSites
 {
@@ -22,19 +23,23 @@ namespace Office365RESTExplorerforSites
     /// </summary>
     public sealed partial class SettingsFlyout1 : SettingsFlyout
     {
+        private ObservableDictionary defaultViewModel = new ObservableDictionary();
         public SettingsFlyout1()
         {
             this.InitializeComponent();
 
-            //Create the data bindings
-            Binding serviceResourceIdBinding = new Binding();
-            serviceResourceIdBinding.Mode = BindingMode.OneWay;
-            serviceResourceIdBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            this.txtSite.SetBinding(TextBlock.TextProperty, serviceResourceIdBinding);
-            Binding userAccountBinding = new Binding();
-            userAccountBinding.Mode = BindingMode.OneWay;
-            userAccountBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            this.txtUser.SetBinding(TextBlock.TextProperty, userAccountBinding);
+            // Add the local settings to the view model
+            this.DefaultViewModel["ServiceResourceId"] = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.DefaultViewModel["UserAccount"] = ApplicationData.Current.LocalSettings.Values["UserAccount"];
         }
+
+        /// <summary>
+        /// This can be changed to a strongly typed view model.
+        /// </summary>
+        public ObservableDictionary DefaultViewModel
+        {
+            get { return this.defaultViewModel; }
+        }
+
     }
 }

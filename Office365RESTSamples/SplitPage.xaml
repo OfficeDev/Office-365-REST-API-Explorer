@@ -138,7 +138,9 @@
                 <StackPanel x:Name="requestDetailPanel" Margin="10,0,0,0" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="endpointLabel" Text="EndPoint" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <StackPanel x:Name="endpointPanel" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <HyperlinkButton x:Name="SPSiteLink">LinkToTheSite</HyperlinkButton>
+                        <HyperlinkButton x:Name="SPSiteLink" 
+                                         NavigateUri="{Binding Path=ServiceResourceId}"
+                                         Content="{Binding Path=ServiceResourceId}" DataContext="{Binding DataContext, ElementName=pageRoot}"/>
                         <TextBox x:Name="endpointText" Text="{Binding Request.ApiUrl, Mode=TwoWay}"></TextBox>
                         <TextBox x:Name="responseStatusText" Text="{Binding Response.Status}" Visibility="Collapsed"></TextBox>
                     </StackPanel>
@@ -150,7 +152,7 @@
                 <StackPanel x:Name="requestHeadersPanel" Grid.Row="3" Orientation="Vertical" VerticalAlignment="Top">
                     <TextBlock x:Name="headersLabel" Margin="10,0,0,0" Text="Headers" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="requestHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Request.Headers, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay}" AcceptsReturn="True"></TextBox>
+                <TextBox x:Name="requestHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Request.Headers, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay, UpdateSourceTrigger=Explicit}" AcceptsReturn="True"></TextBox>
                 <TextBox x:Name="responseHeadersText" MinWidth="400" Grid.Row="3" Margin="10,25,0,0" Text="{Binding Response.Headers, Converter={StaticResource JsonObjectConverter}}" IsReadOnly="True" AcceptsReturn="True" Visibility="Collapsed"></TextBox>
                 
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >

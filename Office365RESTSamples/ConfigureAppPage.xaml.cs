@@ -29,15 +29,7 @@ namespace Office365RESTExplorerforSites
         public ConfigureAppPage()
         {
             this.InitializeComponent();
-
-            Binding siteBinding = new Binding();
-            siteBinding.Mode = BindingMode.TwoWay;
-            siteBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            siteBinding.FallbackValue = "Office 365 site e.g. https://contoso.sharepoint.com";
-            this.spSite.SetBinding(TextBox.TextProperty, siteBinding);
         }
-
-
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {

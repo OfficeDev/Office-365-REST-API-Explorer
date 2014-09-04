@@ -5,7 +5,6 @@
     xmlns:local="using:Office365RESTExplorerforSites"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    DataContext="{Binding Windows.Storage.ApplicationData.Current.LocalSettings}"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
@@ -16,11 +15,11 @@
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Grid.Column="1" Margin="341.25,0,402,0">
             <TextBlock x:Name="pageTitle" Style="{StaticResource HeaderTextBlockStyle}" 
     		IsHitTestVisible="false" TextWrapping="WrapWholeWords"  VerticalAlignment="Bottom" Margin="0,320,0,20" Height="89" TextAlignment="Center" FontFamily="Global User Interface" FontSize="48">
-    		Office 365 REST API 
+    		Office 365 REST API Explorer
             <LineBreak/>
             for Sites
             </TextBlock>
-            <TextBox Name="spSite" Height="49" TextWrapping="Wrap" Margin="0,0,0,10" Width="562" FontSize="24" Foreground="#FF383737" FontFamily="Global User Interface"/>
+            <TextBox Name="spSite" Height="49" TextWrapping="Wrap" Margin="0,0,0,10" Width="562" FontSize="24" Foreground="#FF383737" FontFamily="Global User Interface" Text="Office 365 site e.g. https://contoso.sharepoint.com"/>
             <Button Content="Start" HorizontalAlignment="Center" Width="392" Height="58" FontSize="24" Click="Button_Click"/>
         </StackPanel>
     </Grid>

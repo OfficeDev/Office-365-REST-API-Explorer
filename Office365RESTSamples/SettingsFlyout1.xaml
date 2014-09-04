@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     IconSource="Assets/SmallLogo.png"
     Title="Account"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     d:DesignWidth="346">
 
     <!-- This StackPanel acts as a root panel for vertical layout of the content sections -->
@@ -22,7 +23,7 @@
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Office 365 site" FontFamily="Global User Interface" />
 
             <!-- Section 1 body -->
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtSite">
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtSite" Text="{Binding Path=ServiceResourceId}">
 
             </TextBlock>
 
@@ -30,7 +31,7 @@
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="User account" FontFamily="Global User Interface"/>
 
             <!-- Section 2 body -->
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtUser">
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtUser" Text="{Binding Path=UserAccount}">
 
             </TextBlock>
         </StackPanel>

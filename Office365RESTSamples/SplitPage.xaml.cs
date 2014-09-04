@@ -68,15 +68,6 @@ namespace Office365RESTExplorerforSites
 
             this.Unloaded += SplitPage_Unloaded;
 
-            //Data bind the controls to local settings
-            Binding navigateUriBinding = new Binding();
-            navigateUriBinding.Mode = BindingMode.OneWay;
-            navigateUriBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            this.SPSiteLink.SetBinding(HyperlinkButton.NavigateUriProperty, navigateUriBinding);
-            Binding hyperlinkContentBinding = new Binding();
-            hyperlinkContentBinding.Mode = BindingMode.OneWay;
-            hyperlinkContentBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            this.SPSiteLink.SetBinding(HyperlinkButton.ContentProperty, hyperlinkContentBinding);
         }
 
         /// <summary>
@@ -103,6 +94,7 @@ namespace Office365RESTExplorerforSites
             var group = await DataSource.GetGroupAsync((String)e.NavigationParameter);
             this.DefaultViewModel["Group"] = group;
             this.DefaultViewModel["Items"] = group.Items;
+            this.DefaultViewModel["ServiceResourceId"] = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
 
             if (e.PageState == null)
             {
@@ -272,6 +264,17 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                // Update the headers data source
+                BindingExpression headersBindingExpression = requestHeadersText.GetBindingExpression(TextBox.TextProperty);
+                headersBindingExpression.UpdateSource();
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+            
             // Create a new response item and assign it to the current item in the data source
             var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
             selectedItem.Response = await DataSource.GetResponseAsync(selectedItem.Request);
