@@ -70,28 +70,25 @@
         </GridView>
 
         <RichTextBlock Name="Description" Grid.Column="2" Grid.RowSpan="2" Style="{StaticResource BodyRichTextBlockStyle}" Margin="40,0,40,0" VerticalAlignment="Center">
-            <Paragraph>SharePoint 2013 introduces a Representational State Transfer (REST) service that is comparable to the existing SharePoint client object models. Now, developers can interact remotely with SharePoint data by using any technology that supports REST web requests. This means that developers can perform Create, Read, Update, and Delete (CRUD) operations from their apps for SharePoint, solutions, and client applications, using REST web technologies and standard Open Data Protocol (OData) syntax.</Paragraph>
-            <Paragraph>For more information, see
+            <Paragraph>SharePoint 2013 introduces the REST service that you can use to interact with SharePoint data in your own apps and websites. Use this app to create, edit, and test your REST requests. You can also watch the response, including status codes, headers, body, and any error messages that the REST service returns.
+                <LineBreak/>
+            </Paragraph>
+            <Paragraph>Start by choosing a SharePoint item from the tiles on the left. There are CRUD operations preloaded for lists, list items, and documents.
+                <LineBreak/>
+            </Paragraph>
+            <Paragraph>For more information about the REST service in SharePoint, see
                 <Hyperlink NavigateUri="http://aka.ms/F1lnxt">Get started with the SharePoint 2013 REST service</Hyperlink>.
                 <LineBreak/>
             </Paragraph>
-            <Paragraph>Use this app to try the REST endpoints that you need to use in your apps. Select the tiles to the left to find CRUD operations for the selected item.</Paragraph>
         </RichTextBlock>
 
-        <!-- Back button and page title -->
+        <!-- Page title -->
         <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-                        Style="{StaticResource NavigationBackButtonNormalStyle}"
-                        VerticalAlignment="Top"
-                        AutomationProperties.Name="Back"
-                        AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"
-                        Visibility="Collapsed"/>
-            <TextBlock x:Name="pageTitle" Text="Office 365 REST API for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+            <TextBlock x:Name="pageTitle" Text="Office 365 REST API Explorer for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>
 

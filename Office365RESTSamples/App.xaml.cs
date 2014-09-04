@@ -115,7 +115,7 @@ namespace Office365RESTExplorerforSites
                 if (configured)
                     rootFrame.Navigate(typeof(ItemsPage), e.Arguments);
                 else
-                    rootFrame.Navigate(typeof(StartPage), e.Arguments);
+                    rootFrame.Navigate(typeof(ConfigureAppPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();

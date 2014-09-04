@@ -19,17 +19,13 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using System.Threading.Tasks;
-using Windows.Storage;
 using Microsoft.Office365.OAuth;
-
-// The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
 namespace Office365RESTExplorerforSites
 {
     /// <summary>
-    /// A page that displays a collection of item previews.  In the Split App this page
-    /// is used to display and select one of the available groups.
+    /// A page that displays the list of operations available and 
+    /// UI elements to create an edit a request and see the response
     /// </summary>
     public sealed partial class ItemsPage : Page
     {
@@ -115,7 +111,6 @@ namespace Office365RESTExplorerforSites
                 AuthenticationResult authResult;
                 MessageDialog errorDialog = null;
                 
-
                 try
                 {
                     Uri spSiteUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
@@ -123,15 +118,17 @@ namespace Office365RESTExplorerforSites
 
                     var dcr = await _discoveryContext.DiscoverResourceAsync(spSiteUri.AbsoluteUri);
 
+                    // Authenticate the user, if there are valid tokens in the cache, the AcquireTokenSilentAsync method 
+                    // should get a new token with the Refresh Token
                     authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(
                                                                                     spSiteUri.AbsoluteUri,
                                                                                     _discoveryContext.AppIdentity.ClientId,
                                                                                     new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
                                                                                     );
 
-
                     if (authResult.Status != AuthenticationStatus.Success)
                     {
+                        // Authentication failed, notify the user
                         throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
                     }
 
@@ -139,8 +136,6 @@ namespace Office365RESTExplorerforSites
                     ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
                     ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;
                     ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"] = authResult.ExpiresOn;
-
-                    this.Frame.Navigate(typeof(ItemsPage));
                 }
                 catch (FormatException)
                 {
@@ -153,6 +148,7 @@ namespace Office365RESTExplorerforSites
                     errorDialog = new MessageDialog("We couldn't sign you in to your Office 356 site.", "Authentication failed");
                 }
 
+                // If there were any errors, show it to the user
                 if (errorDialog != null)
                     await errorDialog.ShowAsync();
 

@@ -14,18 +14,19 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
-using Microsoft.Office365.OAuth;
-
-// The Settings Flyout item template is documented at http://go.microsoft.com/fwlink/?LinkId=273769
 
 namespace Office365RESTExplorerforSites
 {
+    /// <summary>
+    /// A settings flyout that shows the configured username and site
+    /// </summary>
     public sealed partial class SettingsFlyout1 : SettingsFlyout
     {
         public SettingsFlyout1()
         {
             this.InitializeComponent();
 
+            //Create the data bindings
             Binding serviceResourceIdBinding = new Binding();
             serviceResourceIdBinding.Mode = BindingMode.OneWay;
             serviceResourceIdBinding.Source = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];

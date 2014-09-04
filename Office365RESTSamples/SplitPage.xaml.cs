@@ -16,15 +16,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using System.Text;
 using Windows.Storage;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
-using Windows.Data.Json;
-using Newtonsoft.Json;
-using System.Net;
-
-// The Split Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234234
 
 namespace Office365RESTExplorerforSites
 {

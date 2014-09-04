@@ -14,22 +14,19 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using System.Threading.Tasks;
 using Windows.Storage;
-using Office365RESTExplorerforSites.Common;
 using Microsoft.Office365.OAuth;
 using Windows.UI.Popups;
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Office365RESTExplorerforSites
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A page that shows the user a textbox for the SharePoint site to use
+    /// This page should only run once when the user installs the app
     /// </summary>
-    public sealed partial class StartPage : Page
+    public sealed partial class ConfigureAppPage : Page
     {
-        public StartPage()
+        public ConfigureAppPage()
         {
             this.InitializeComponent();
 

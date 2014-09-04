@@ -8,24 +8,25 @@ using Windows.Storage;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
-using Newtonsoft.Json;
-using Windows.UI.Xaml.Data;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-// The data model defined by this file serves as a representative example of a strongly-typed
-// model.  The property names chosen coincide with data bindings in the standard item templates.
-//
-// Applications may use this model as a starting point and build on it, or discard it entirely and
-// replace it with something appropriate to their needs. If using this model, you might improve app 
-// responsiveness by initiating the data loading task in the code behind for App.xaml when the app 
-// is first launched.
+// The data model represents a hierarchical organization of objects as follows
+// DataSource -> DataGroups -> DataItems -> ResponseItem
+//                                       -> RequestItem
+// All the objects are read from the InitialData.json file except for the ResponseItem object.
+// ResponseItem object is created by issuing a request to the REST endpoint in the GetResponseAsync method
+// DataGroups are used to populate the page that shows the SharePoint objects (lists, list items, documents)
+// DataItems are used to populate the page that has the REST request and response. Usually, these are the CRUD operations.
 
 namespace Office365RESTExplorerforSites.Data
 {
+    /// <summary>
+    /// A data source object that models an HTTP response. Note that this object doesn't have a representation in the InitialData.json file
+    /// </summary>
     public class ResponseItem
     {
         public ResponseItem(string responseUri, string status, JsonObject headers, JsonObject body)
@@ -41,6 +42,10 @@ namespace Office365RESTExplorerforSites.Data
         public JsonObject Body { get; private set; }
         public string Status { get; private set; }
     }
+
+    /// <summary>
+    /// A data source object that models an HTTP request. The InitialData.json file has one RequestItem object for eevery DataItem
+    /// </summary>
     public class RequestItem : INotifyPropertyChanged
     {
         public RequestItem(string apiUrl, string method, JsonObject headers, JsonObject body)
@@ -76,7 +81,7 @@ namespace Office365RESTExplorerforSites.Data
         }
     }
     /// <summary>
-    /// Generic item data model.
+    /// Item data model. An item one of the CRUD operations that appear in the InitialData.json file
     /// </summary>
     public class DataItem : INotifyPropertyChanged
     {
@@ -133,7 +138,8 @@ namespace Office365RESTExplorerforSites.Data
     }
 
     /// <summary>
-    /// Generic group data model.
+    /// Group data model. A group is each one of the SharePoint elements, for now those are lists, list items, and documents.
+    /// Every group has items in it, usually CRUD operations.
     /// </summary>
     public class DataGroup
     {
@@ -164,13 +170,13 @@ namespace Office365RESTExplorerforSites.Data
 
     /// <summary>
     /// Creates a collection of groups and items with content read from a static json file.
-    /// 
-    /// SampleDataSource initializes with data read from a static json file included in the 
+    /// DataSource initializes with data read from a static json file included in the 
     /// project.  This provides sample data at both design-time and run-time.
+    /// It also provides a method to issues a request to a REST endpoint and get a response object
     /// </summary>
     public sealed class DataSource
     {
-        private static DataSource _sampleDataSource = new DataSource();
+        private static DataSource _dataSource = new DataSource();
 
         private ObservableCollection<DataGroup> _groups = new ObservableCollection<DataGroup>();
         public ObservableCollection<DataGroup> Groups
@@ -180,25 +186,25 @@ namespace Office365RESTExplorerforSites.Data
 
         public static async Task<IEnumerable<DataGroup>> GetGroupsAsync()
         {
-            await _sampleDataSource.GetSampleDataAsync();
+            await _dataSource.GetSampleDataAsync();
 
-            return _sampleDataSource.Groups;
+            return _dataSource.Groups;
         }
 
         public static async Task<DataGroup> GetGroupAsync(string uniqueId)
         {
-            await _sampleDataSource.GetSampleDataAsync();
+            await _dataSource.GetSampleDataAsync();
             // Simple linear search is acceptable for small data sets
-            var matches = _sampleDataSource.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
+            var matches = _dataSource.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
             if (matches.Count() == 1) return matches.First();
             return null;
         }
 
         public static async Task<DataItem> GetItemAsync(string uniqueId)
         {
-            await _sampleDataSource.GetSampleDataAsync();
+            await _dataSource.GetSampleDataAsync();
             // Simple linear search is acceptable for small data sets
-            var matches = _sampleDataSource.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
+            var matches = _dataSource.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
             if (matches.Count() == 1) return matches.First();
             return null;
         }
@@ -248,10 +254,11 @@ namespace Office365RESTExplorerforSites.Data
             string responseUri;
             JsonObject headers = null;
             JsonObject body = null;
+            string responseString = string.Empty;
 
             try
             {
-                // If the request is succesful we can use the endpointResponse object
+                // If the request is successful we can use the endpointResponse object
                 HttpWebResponse endpointResponse = (HttpWebResponse)await endpointRequest.GetResponseAsync();
                 status = (int)endpointResponse.StatusCode + " - " + endpointResponse.StatusDescription;
                 responseStream = endpointResponse.GetResponseStream();
@@ -267,11 +274,13 @@ namespace Office365RESTExplorerforSites.Data
                 responseHeaders = we.Response.Headers;
             }
 
-            string responseString = string.Empty;
             using (StreamReader reader = new StreamReader(responseStream, Encoding.UTF8))
             {
                 responseString = await reader.ReadToEndAsync();
             }
+
+            // Free resources used by the stream
+            responseStream.Dispose();
 
             if (!String.IsNullOrEmpty(responseString))
             {
@@ -337,43 +346,9 @@ namespace Office365RESTExplorerforSites.Data
                     
                     //Add the item to the group
                     group.Items.Add(item);
-
-
                 }
                 this.Groups.Add(group);
             }
         }
     }
-
-    public class JsonObjectConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            // Format the json object as a correctly indented string
-            JsonObject jsonObject = (JsonObject)value;
-            return JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            // Convert back from the string to a json object
-            String strJson = (String)value;
-            return JsonObject.Parse(strJson);
-        }
-    }
-    public class MethodConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            // In the UI POST is true, Get is false
-            return String.Compare((string)value, "POST") == 0;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            // if the UI returns true, then method is POST, else it is GET
-            return (bool)value ? "POST" : "GET";
-        }
-    }
-
 }
