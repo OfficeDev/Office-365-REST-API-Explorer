@@ -26,11 +26,7 @@ namespace Office365RESTExplorerforSites.Data
         {
             // Convert back from the string to a json object
             String strJson = (String)value;
-            JsonObject convertedObject;
 
-            // If the string is valid JSON, return a JsonObject, else, return a null value.
-            // A null value will raise a NullReferenceException in the UI that we can handle.
-            // return JsonObject.TryParse(strJson, out convertedObject) ? convertedObject : null;
             return JsonObject.Parse(strJson);
         }
     }

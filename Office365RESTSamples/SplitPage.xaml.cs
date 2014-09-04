@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
+using Windows.UI.Popups;
 
 
 namespace Office365RESTExplorerforSites
@@ -264,23 +265,44 @@ namespace Office365RESTExplorerforSites
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
+            MessageDialog errorDialog = null;
+
             try
             {
                 // Update the headers data source
                 BindingExpression headersBindingExpression = requestHeadersText.GetBindingExpression(TextBox.TextProperty);
                 headersBindingExpression.UpdateSource();
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
-
+                errorDialog = new MessageDialog("The headers data is not a well-formed JSON string");
             }
-            
-            // Create a new response item and assign it to the current item in the data source
-            var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
-            selectedItem.Response = await DataSource.GetResponseAsync(selectedItem.Request);
+            try
+            {
+                // Update the headers data source
+                BindingExpression bodyBindingExpression = requestBodyText.GetBindingExpression(TextBox.TextProperty);
+                bodyBindingExpression.UpdateSource();
+            }
+            catch (Exception)
+            {
+                errorDialog = new MessageDialog("The body is not a well-formed JSON string");
+            }
 
-            // Show the Response UI
-            VisualStateManager.GoToState(this, "ResponseView", true);
+            if (errorDialog == null)
+            {
+                // There are no errors that stop us from sending the request.
+                // Create a new response item and assign it to the current item in the data source
+                var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
+                selectedItem.Response = await DataSource.GetResponseAsync(selectedItem.Request);
+
+                // Show the Response UI
+                VisualStateManager.GoToState(this, "ResponseView", true);
+            }
+            else
+            {
+                // There are errors that prevent us from sending the request. Show the error dialog to the user.
+                await errorDialog.ShowAsync();
+            }
         }
 
         private void backToRequest_Click(object sender, RoutedEventArgs e)

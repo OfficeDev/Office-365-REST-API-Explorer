@@ -158,7 +158,7 @@
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="requestBodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="requestBodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay, UpdateSourceTrigger=Explicit}" Grid.Row="4" AcceptsReturn="True"/>
                 <TextBox x:Name="responseBodyText" Grid.Row="4" Margin="10,25,0,0" Text="{Binding Response.Body, Converter={StaticResource JsonObjectConverter}}" AcceptsReturn="True" IsReadOnly="True" Visibility="Collapsed"/>
             </Grid>
         </ScrollViewer>
