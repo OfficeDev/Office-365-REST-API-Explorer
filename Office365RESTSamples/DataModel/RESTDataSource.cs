@@ -48,13 +48,13 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class RequestItem : INotifyPropertyChanged
     {
-        public RequestItem(string apiUrl, string method, JsonObject headers, JsonObject body)
+        public RequestItem(Uri apiUrl, string method, JsonObject headers, JsonObject body)
         {
             this.ApiUrl = apiUrl;
 
             // Validate that the method is either "GET" or "POST"
             if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
-                throw new ArgumentOutOfRangeException("The HTTP method can only be GET or POST.");
+                throw new ArgumentOutOfRangeException("method", "The HTTP method can only be GET or POST.");
             else
                 this.Method = method;
 
@@ -62,7 +62,7 @@ namespace Office365RESTExplorerforSites.Data
             this.Body = body;
         }
 
-        public string ApiUrl { get; set; }
+        public Uri ApiUrl { get; set; }
         public JsonObject Headers { get; set; }
         public JsonObject Body { get; set; }
         public string Method { get; set; }
@@ -98,7 +98,6 @@ namespace Office365RESTExplorerforSites.Data
         public string Title { get; private set; }
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
-        public string ApiUrl { get; private set; }
         public RequestItem Request { get; set; }
         public ResponseItem Response {
             get
@@ -143,7 +142,7 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class DataGroup
     {
-        public DataGroup(String uniqueId, String title, String subtitle, String imagePath, String moreInfoText, String moreInfoUri)
+        public DataGroup(String uniqueId, String title, String subtitle, String imagePath, String moreInfoText, Uri moreInfoUri)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
@@ -158,7 +157,7 @@ namespace Office365RESTExplorerforSites.Data
         public string Title { get; private set; }
         public string Subtitle { get; private set; }
         public string ImagePath { get; private set; }
-        public string MoreInfoUri { get; private set; }
+        public Uri MoreInfoUri { get; private set; }
         public string MoreInfoText { get; private set; }
         public ObservableCollection<DataItem> Items { get; private set; }
 
@@ -317,7 +316,7 @@ namespace Office365RESTExplorerforSites.Data
                                                             groupObject["Subtitle"].GetString(),
                                                             groupObject["ImagePath"].GetString(),
                                                             groupObject["MoreInfoText"].GetString(),
-                                                            groupObject["MoreInfoUri"].GetString());
+                                                            new Uri(groupObject["MoreInfoUri"].GetString()));
 
                 foreach (JsonValue itemValue in groupObject["Items"].GetArray())
                 {
@@ -329,7 +328,7 @@ namespace Office365RESTExplorerforSites.Data
                     jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
 
                     //Create the request object
-                    RequestItem request = new RequestItem(requestObject["ApiUrl"].GetString(),
+                    RequestItem request = new RequestItem(new Uri(requestObject["ApiUrl"].GetString(), UriKind.Relative),
                                                        requestObject["Method"].GetString(),
                                                        jsonHeaders,
                                                        requestObject["Body"].GetObject());
