@@ -40,7 +40,7 @@ namespace Office365RESTExplorerforSites.Data
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             // In the UI POST is true, Get is false
-            return String.Compare((string)value, "POST") == 0;
+            return String.Compare((string)value, "POST", StringComparison.CurrentCultureIgnoreCase) == 0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

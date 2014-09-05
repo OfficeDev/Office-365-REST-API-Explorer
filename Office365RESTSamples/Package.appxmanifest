@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="79fbe851-86c8-47db-bdfa-9e30700b31bc" Publisher="CN=ricardol" Version="0.0.1.0" />
+  <Identity Name="79fbe851-86c8-47db-bdfa-9e30700b31bc" Publisher="CN=ricardol" Version="0.0.1.2" />
   <Properties>
     <DisplayName>Office365RESTExplorerforSites</DisplayName>
     <PublisherDisplayName>ricardol</PublisherDisplayName>

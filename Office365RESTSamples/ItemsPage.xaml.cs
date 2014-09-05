@@ -168,7 +168,6 @@ namespace Office365RESTExplorerforSites
         private void pageRoot_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // If the window resizes go to the visual state that works for the width
-            //VisualStateManager.GoToState(this, DetermineVisualState(), false);
             if(Window.Current.Bounds.Width < MinimumWidthForSupportingTwoPanes)
             {
                 secondaryColumn.Width = new GridLength(0);
@@ -179,19 +178,6 @@ namespace Office365RESTExplorerforSites
                 secondaryColumn.Width = new GridLength(1, GridUnitType.Star);
                 Description.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
-        }
-
-        /// <summary>
-        /// Invoked to determine the name of the visual state that corresponds to an application
-        /// view state.
-        /// </summary>
-        /// <returns>The name of the desired visual state.  This is the same as the name of the
-        /// view state except when there is a selected item in portrait and snapped views where
-        /// this additional logical page is represented by adding a suffix of _Detail.</returns>
-        private string DetermineVisualState()
-        {
-            //If the width is less than the supported minimum reurn SinglePane
-            return Window.Current.Bounds.Width < MinimumWidthForSupportingTwoPanes ? "PrimaryView" : "SinglePane";
         }
     }
 }

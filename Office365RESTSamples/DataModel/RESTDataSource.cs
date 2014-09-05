@@ -29,7 +29,7 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class ResponseItem
     {
-        public ResponseItem(string responseUri, string status, JsonObject headers, JsonObject body)
+        public ResponseItem(Uri responseUri, string status, JsonObject headers, JsonObject body)
         {
             this.ResponseUri = responseUri;
             this.Status = status;
@@ -37,7 +37,7 @@ namespace Office365RESTExplorerforSites.Data
             this.Body = body;
         }
 
-        public string ResponseUri { get; private set; }
+        public Uri ResponseUri { get; private set; }
         public JsonObject Headers { get; private set; }
         public JsonObject Body { get; private set; }
         public string Status { get; private set; }
@@ -251,7 +251,7 @@ namespace Office365RESTExplorerforSites.Data
             Stream responseStream;
             WebHeaderCollection responseHeaders;
             string status;
-            string responseUri;
+            Uri responseUri;
             JsonObject headers = null;
             JsonObject body = null;
             string responseString = string.Empty;
@@ -262,7 +262,7 @@ namespace Office365RESTExplorerforSites.Data
                 HttpWebResponse endpointResponse = (HttpWebResponse)await endpointRequest.GetResponseAsync();
                 status = (int)endpointResponse.StatusCode + " - " + endpointResponse.StatusDescription;
                 responseStream = endpointResponse.GetResponseStream();
-                responseUri = endpointResponse.ResponseUri.AbsoluteUri;
+                responseUri = endpointResponse.ResponseUri;
                 responseHeaders = endpointResponse.Headers;
             }
             catch (WebException we)
@@ -270,7 +270,7 @@ namespace Office365RESTExplorerforSites.Data
                 // If the request fails, we must use the response stream from the exception
                 status = we.Message;
                 responseStream = we.Response.GetResponseStream();
-                responseUri = we.Response.ResponseUri.AbsoluteUri;
+                responseUri = we.Response.ResponseUri;
                 responseHeaders = we.Response.Headers;
             }
 
