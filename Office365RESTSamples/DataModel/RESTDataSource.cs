@@ -52,7 +52,7 @@ namespace Office365RESTExplorerforSites.Data
     {
         public RequestItem(Uri apiUrl, string method, JsonObject headers, JsonObject body)
         {
-            this.ApiUrl = apiUrl;
+            this.ApiUrl = apiUrl.OriginalString;
 
             // Validate that the method is either "GET" or "POST"
             if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
@@ -64,7 +64,7 @@ namespace Office365RESTExplorerforSites.Data
             this.Body = body;
         }
 
-        public Uri ApiUrl { get; set; }
+        public string ApiUrl { get; set; }
         public JsonObject Headers { get; set; }
         public JsonObject Body { get; set; }
         public string Method { get; set; }
