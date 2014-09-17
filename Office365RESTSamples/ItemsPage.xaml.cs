@@ -155,6 +155,7 @@ namespace Office365RESTExplorerforSites
                     await errorDialog.ShowAsync();
 
                 //Update the data source
+                DataSource.Clear();
                 var sampleDataGroups = await DataSource.GetGroupsAsync();
                 this.DefaultViewModel["Items"] = sampleDataGroups;
             }

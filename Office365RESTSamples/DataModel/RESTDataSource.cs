@@ -192,6 +192,11 @@ namespace Office365RESTExplorerforSites.Data
             return _dataSource.Groups;
         }
 
+        public static void Clear()
+        {
+            _dataSource.Groups.Clear();
+        }
+
         public static async Task<DataGroup> GetGroupAsync(string uniqueId)
         {
             await _dataSource.GetSampleDataAsync();
