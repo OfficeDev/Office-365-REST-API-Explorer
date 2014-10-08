@@ -79,7 +79,7 @@
                 <LineBreak/>
             </Paragraph>
             <Paragraph>For more information about the REST service in SharePoint, see
-                <Hyperlink NavigateUri="http://aka.ms/F1lnxt">Get started with the SharePoint 2013 REST service</Hyperlink>.
+                <Hyperlink NavigateUri="http://msdn.microsoft.com/library/office/fp142380.aspx">Get started with the SharePoint 2013 REST service</Hyperlink>.
                 <LineBreak/>
             </Paragraph>
         </RichTextBlock>

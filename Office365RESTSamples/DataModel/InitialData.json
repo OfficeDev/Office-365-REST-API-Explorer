@@ -5,7 +5,7 @@
         "Subtitle": "Common operations on lists",
         "ImagePath": "Assets/List.png",
         "MoreInfoText": "Working with lists by using REST",
-        "MoreInfoUri": "http://aka.ms/U2mrv6",
+        "MoreInfoUri": "http://msdn.microsoft.com/library/office/dn292552.aspx#WorkLists",
         "Items": [
             {
                 "UniqueId": "Group-1-Item-1",
@@ -99,7 +99,7 @@
         "Subtitle": "Perform operations on list items",
         "ImagePath": "Assets/ListItem.png",
         "MoreInfoText": "Working with list items by using REST",
-        "MoreInfoUri": "http://aka.ms/Kyk3pl",
+        "MoreInfoUri": "http://msdn.microsoft.com/library/office/dn292552.aspx#ListItems",
         "Items": [
             {
                 "UniqueId": "Group-2-Item-1",
@@ -187,7 +187,7 @@
         "Subtitle": "Work with files in document libraries",
         "ImagePath": "Assets/Document.png",
         "MoreInfoText": "Working with files by using REST",
-        "MoreInfoUri": "http://aka.ms/Til10h",
+        "MoreInfoUri": "http://msdn.microsoft.com/library/office/dn292553.aspx#Files",
         "Items": [
             {
                 "UniqueId": "Group-3-Item-1",
