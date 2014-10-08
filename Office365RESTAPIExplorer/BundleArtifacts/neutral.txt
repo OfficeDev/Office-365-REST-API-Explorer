@@ -1,0 +1,2 @@
+MainPackage=D:\code\patsol\Office365RESTforSites\Office365RESTSamples\bin\Release\Office365RESTAPIforSites_0.0.1.4_Bundle\Office365RESTAPIforSites_0.0.1.4_AnyCPU.appx
+SymbolPackage=D:\code\patsol\Office365RESTforSites\Office365RESTSamples\AppPackages\Office365RESTAPIforSites_0.0.1.4_Test\Office365RESTAPIforSites_0.0.1.4_AnyCPU.appxsym
