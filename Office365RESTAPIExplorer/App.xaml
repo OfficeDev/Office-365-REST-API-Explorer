@@ -13,8 +13,6 @@
 
         <!-- Application-specific resources -->
         <x:String x:Key="AppName">Office 365 REST API for Sites</x:String>
-        <x:String x:Key="ida:ClientID">74fa9bb3-653a-4cfe-86ea-36eb22344bc3</x:String>
-    <x:String x:Key="ida:AuthorizationUri">https://login.windows.net</x:String>
     </Application.Resources>
 </Application>
 
