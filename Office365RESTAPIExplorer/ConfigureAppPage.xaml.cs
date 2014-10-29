@@ -36,7 +36,6 @@ namespace Office365RESTExplorerforSites
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Uri spSiteUri;
-            DiscoveryContext _discoveryContext;
             AuthenticationResult authResult;
             MessageDialog errorDialog = null;
 
@@ -45,16 +44,7 @@ namespace Office365RESTExplorerforSites
                 //Validate that the input is at least a well-formed URI
                 spSiteUri = new Uri(spSite.Text);
 
-                _discoveryContext = await DiscoveryContext.CreateAsync();
-
-                var dcr = await _discoveryContext.DiscoverResourceAsync(spSiteUri.AbsoluteUri);
-
-                authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(
-                                                                                spSiteUri.AbsoluteUri,
-                                                                                _discoveryContext.AppIdentity.ClientId,
-                                                                                new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
-                                                                                );
-
+                authResult = await AuthenticationHelper.EnsureAccessTokenAvailableAsync(spSiteUri.AbsoluteUri, PromptBehavior.Auto);
 
                 if (authResult.Status != AuthenticationStatus.Success)
                 {
@@ -63,7 +53,7 @@ namespace Office365RESTExplorerforSites
 
                 // Store the relevant data in local settings.
                 ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSiteUri.AbsoluteUri;
-                ApplicationData.Current.LocalSettings.Values["UserId"] = dcr.UserId;
+                ApplicationData.Current.LocalSettings.Values["UserId"] = authResult.UserInfo.UniqueId;
                 ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult.UserInfo.DisplayableId;
                 ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
                 ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;

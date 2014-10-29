@@ -109,24 +109,16 @@ namespace Office365RESTExplorerforSites
             // If the access token has expired, renew it and update the data source
             if (DateTimeOffset.Compare((DateTimeOffset)ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"], DateTimeOffset.Now) <= 0)
             {
-                DiscoveryContext _discoveryContext;
                 AuthenticationResult authResult;
                 MessageDialog errorDialog = null;
                 
                 try
                 {
                     Uri spSiteUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-                    _discoveryContext = await DiscoveryContext.CreateAsync();
 
-                    var dcr = await _discoveryContext.DiscoverResourceAsync(spSiteUri.AbsoluteUri);
-
-                    // Authenticate the user, if there are valid tokens in the cache, the AcquireTokenSilentAsync method 
+                    // Authenticate the user, if there are valid tokens in the cache, the EnsureAccessTokenAvailableAsync method 
                     // should get a new token with the Refresh Token
-                    authResult = await _discoveryContext.AuthenticationContext.AcquireTokenSilentAsync(
-                                                                                    spSiteUri.AbsoluteUri,
-                                                                                    _discoveryContext.AppIdentity.ClientId,
-                                                                                    new UserIdentifier(dcr.UserId, UserIdentifierType.UniqueId)
-                                                                                    );
+                    authResult = await AuthenticationHelper.EnsureAccessTokenAvailableAsync(spSiteUri.AbsoluteUri, PromptBehavior.Auto);
 
                     if (authResult.Status != AuthenticationStatus.Success)
                     {
