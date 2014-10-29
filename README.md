@@ -15,7 +15,7 @@ You can perform CRUD operations on the following items in a SharePoint site:
 This sample requires the following:
 
   - Visual Studio 2013 with Update 3.
-  - [Office 365 API Tools version 1.1.728](http://visualstudiogallery.msdn.microsoft.com/7e947621-ef93-4de7-93d3-d796c43ba34f).
+  - [Office 365 API Tools version 1.2.41027.2](http://visualstudiogallery.msdn.microsoft.com/7e947621-ef93-4de7-93d3-d796c43ba34f).
   - An [Office 365 developer site](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1).
 
 ###Configure the sample
@@ -65,7 +65,8 @@ Note: After adding the connected service, a sample file is added to the solution
 You may run into an authentication error after deploying and running if apps do not have the ability to access account information in the [Windows Privacy Settings](http://www.microsoft.com/security/online-privacy/windows.aspx) menu. Set **Let my apps access my name, picture, and other account info** to **On**.
 
 Known issues
+
   - You need to provide a site that is at the root of the web application. For example: the https://*&lt;tenant&gt;*.sharepoint.com site. The sign in process fails with non-root site collections.
-  - You get the following error message: "Invalid JWT token. The token is expired." This means that the access token has expired. Go to the start page and provide your credentials to renew the access token.
+  - You get the following error message: "Invalid JWT token. The token is expired." This means that the access token can't be used anymore. Go to the ItemsPage screen, this will renew the access token.
 
 Copyright (c) Microsoft. All rights reserved.
