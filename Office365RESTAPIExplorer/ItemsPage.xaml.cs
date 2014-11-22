@@ -22,6 +22,7 @@ using Windows.Storage;
 using Windows.UI.Popups;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Office365.OAuth;
+using Office365RESTExplorerforSites.Helpers;
 
 namespace Office365RESTExplorerforSites
 {
@@ -73,8 +74,8 @@ namespace Office365RESTExplorerforSites
         /// session.  The state will be null the first time a page is visited.</param>
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            var sampleDataGroups = await DataSource.GetGroupsAsync();
-            this.DefaultViewModel["Items"] = sampleDataGroups;
+            var dataGroups = await DataSource.GetGroupsAsync();
+            this.DefaultViewModel["Items"] = dataGroups;
         }
 
         /// <summary>
@@ -102,55 +103,9 @@ namespace Office365RESTExplorerforSites
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-
-            // If the access token has expired, renew it and update the data source
-            if (DateTimeOffset.Compare((DateTimeOffset)ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"], DateTimeOffset.Now) <= 0)
-            {
-                AuthenticationResult authResult;
-                MessageDialog errorDialog = null;
-                
-                try
-                {
-                    Uri spSiteUri = new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString());
-
-                    // Authenticate the user, if there are valid tokens in the cache, the EnsureAccessTokenAvailableAsync method 
-                    // should get a new token with the Refresh Token
-                    authResult = await AuthenticationHelper.EnsureAccessTokenAvailableAsync(spSiteUri.AbsoluteUri, PromptBehavior.Auto);
-
-                    if (authResult.Status != AuthenticationStatus.Success)
-                    {
-                        // Authentication failed, notify the user
-                        throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
-                    }
-
-                    // Store the relevant data in local settings.
-                    ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
-                    ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;
-                    ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"] = authResult.ExpiresOn;
-                }
-                catch (FormatException)
-                {
-                    // Tell the user to correct the site URL
-                    errorDialog = new MessageDialog("It looks like the Office 365 site is not a valid URL.", "Invalid Office 365 site");
-                }
-                catch (AuthenticationFailedException)
-                {
-                    // Tell the user that the authentication failed
-                    errorDialog = new MessageDialog("We couldn't sign you in to your Office 356 site.", "Authentication failed");
-                }
-
-                // If there were any errors, show it to the user
-                if (errorDialog != null)
-                    await errorDialog.ShowAsync();
-
-                //Update the data source
-                DataSource.Clear();
-                var sampleDataGroups = await DataSource.GetGroupsAsync();
-                this.DefaultViewModel["Items"] = sampleDataGroups;
-            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

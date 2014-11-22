@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file. -->
     
 <SettingsFlyout
-    x:Class="Office365RESTExplorerforSites.SettingsFlyout1"
+    x:Class="Office365RESTExplorerforSites.AccountFlyout"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Office365RESTExplorerforSites"
@@ -25,7 +25,7 @@
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Office 365 site" FontFamily="Global User Interface" />
 
             <!-- Section 1 body -->
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtSite" Text="{Binding Path=ServiceResourceId}">
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtSite" Text="{Binding ServiceResourceId, TargetNullValue=(not configured)}">
 
             </TextBlock>
 
@@ -33,9 +33,11 @@
             <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="User account" FontFamily="Global User Interface"/>
 
             <!-- Section 2 body -->
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtUser" Text="{Binding Path=UserAccount}">
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" Name="txtUser" Text="{Binding Path=UserAccount, TargetNullValue=(not connected)}">
 
             </TextBlock>
+
+            <Button Content="Sign out" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="SignOut_Click" Visibility="{Binding Path=SignOutVisible}"/>
         </StackPanel>
 
         <!-- Define more Content Sections below as necessary -->

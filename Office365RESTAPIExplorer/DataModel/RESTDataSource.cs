@@ -15,6 +15,7 @@ using System.Net;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Office365RESTExplorerforSites.Helpers;
 
 // The data model represents a hierarchical organization of objects as follows
 // DataSource -> DataGroups -> DataItems -> ResponseItem
@@ -31,7 +32,7 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class ResponseItem
     {
-        public ResponseItem(Uri responseUri, string status, JsonObject headers, JsonObject body)
+        public ResponseItem(Uri responseUri, string status, JsonObject headers, string body)
         {
             this.ResponseUri = responseUri;
             this.Status = status;
@@ -41,7 +42,7 @@ namespace Office365RESTExplorerforSites.Data
 
         public Uri ResponseUri { get; private set; }
         public JsonObject Headers { get; private set; }
-        public JsonObject Body { get; private set; }
+        public string Body { get; private set; }
         public string Status { get; private set; }
     }
 
@@ -50,7 +51,7 @@ namespace Office365RESTExplorerforSites.Data
     /// </summary>
     public class RequestItem : INotifyPropertyChanged
     {
-        public RequestItem(Uri apiUrl, string method, JsonObject headers, JsonObject body)
+        public RequestItem(Uri apiUrl, string method, JsonObject headers, string body)
         {
             this.ApiUrl = apiUrl.OriginalString;
 
@@ -66,7 +67,7 @@ namespace Office365RESTExplorerforSites.Data
 
         public string ApiUrl { get; set; }
         public JsonObject Headers { get; set; }
-        public JsonObject Body { get; set; }
+        public string Body { get; set; }
         public string Method { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -220,7 +221,7 @@ namespace Office365RESTExplorerforSites.Data
             HttpWebRequest endpointRequest;
 
             //Validate that the resulting URI is well-formed.
-            Uri endpointUri = new Uri(new Uri(ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString()), request.ApiUrl);
+            Uri endpointUri = new Uri(new Uri(AuthenticationHelper.ServiceResourceId), request.ApiUrl);
 
             endpointRequest = (HttpWebRequest)HttpWebRequest.Create(endpointUri.AbsoluteUri);
             endpointRequest.Method = request.Method;
@@ -247,7 +248,9 @@ namespace Office365RESTExplorerforSites.Data
             //Request body, added to the request only if method is POST
             if (request.Method == "POST")
             {
-                string postData = request.Body.Stringify();
+                // If the request is a create or update file operation, we use the rawBody parameter
+                // otherwise we use the request.Body
+                string postData = request.Body;
                 UTF8Encoding encoding = new UTF8Encoding();
                 byte[] byte1 = encoding.GetBytes(postData);
                 System.IO.Stream newStream = await endpointRequest.GetRequestStreamAsync();
@@ -259,7 +262,7 @@ namespace Office365RESTExplorerforSites.Data
             string status;
             Uri responseUri;
             JsonObject headers = null;
-            JsonObject body = null;
+            string body = null;
             string responseString = string.Empty;
 
             try
@@ -290,7 +293,7 @@ namespace Office365RESTExplorerforSites.Data
 
             if (!String.IsNullOrEmpty(responseString))
             {
-                body = JsonObject.Parse(responseString);
+                body = responseString;
             }
 
             headers = new JsonObject();
@@ -332,13 +335,31 @@ namespace Office365RESTExplorerforSites.Data
 
                     //Add the Authorization header with the access token.
                     JsonObject jsonHeaders = requestObject["Headers"].GetObject();
-                    jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() + ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString());
+                    jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() 
+                        + await AuthenticationHelper.EnsureAccessTokenAvailableAsync());
+
+                    // The body can be a JSON object or string, we need to 
+                    // determine the type of JSON value and use the right 
+                    // method to get the value.
+                    string strBody;
+                    if(requestObject["Body"].ValueType == JsonValueType.Object)
+                    {
+                        strBody = requestObject["Body"].GetObject().Stringify();
+                    }
+                    else if (requestObject["Body"].ValueType == JsonValueType.String)
+                    {
+                        strBody = requestObject["Body"].GetString();
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("The body should only be of value JSON object or JSON string.");
+                    }
 
                     //Create the request object
                     RequestItem request = new RequestItem(new Uri(requestObject["ApiUrl"].GetString(), UriKind.Relative),
                                                        requestObject["Method"].GetString(),
                                                        jsonHeaders,
-                                                       requestObject["Body"].GetObject());
+                                                       strBody);
 
                     //Create the data item object
                     DataItem item = new DataItem(itemObject["UniqueId"].GetString(),

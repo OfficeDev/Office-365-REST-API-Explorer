@@ -1,2 +1,2 @@
-MainPackage=D:\code\patsol\Office365RESTforSites\Office365RESTSamples\bin\Release\Office365RESTAPIforSites_0.0.1.4_Bundle\Office365RESTAPIforSites_0.0.1.4_AnyCPU.appx
-SymbolPackage=D:\code\patsol\Office365RESTforSites\Office365RESTSamples\AppPackages\Office365RESTAPIforSites_0.0.1.4_Test\Office365RESTAPIforSites_0.0.1.4_AnyCPU.appxsym
+MainPackage=D:\code\patsol\Office365RESTforSites\Office365RESTAPIExplorer\bin\Debug\Office365RESTAPIExplorer_0.0.1.5_Bundle\Office365RESTAPIExplorer_0.0.1.5_AnyCPU_Debug.appx
+SymbolPackage=D:\code\patsol\Office365RESTforSites\Office365RESTAPIExplorer\AppPackages\Office365RESTAPIExplorer_0.0.1.5_Debug_Test\Office365RESTAPIExplorer_0.0.1.5_AnyCPU_Debug.appxsym

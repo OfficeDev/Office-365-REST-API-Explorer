@@ -202,7 +202,7 @@
                         "Accept": "application/json;odata=verbose",
                         "Content-type": "text/plain"
                     },
-                    "Body": { "data": "You can also send plain text." }
+                    "Body": "These are the file contents."
                 }
             },
             {
@@ -234,7 +234,7 @@
                         "Content-type": "text/plain",
                         "X-HTTP-Method": "PUT"
                     },
-                    "Body": { "data": "Lorem ipsum and more..." }
+                    "Body": "These are the updated file contents."
                 }
             },
             {

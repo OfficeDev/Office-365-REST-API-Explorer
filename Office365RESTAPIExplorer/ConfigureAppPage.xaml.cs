@@ -19,6 +19,9 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Windows.Storage;
 using Microsoft.Office365.OAuth;
 using Windows.UI.Popups;
+using Office365RESTExplorerforSites.Helpers;
+using Office365RESTExplorerforSites.Data;
+using Office365RESTExplorerforSites.Common;
 
 namespace Office365RESTExplorerforSites
 {
@@ -28,54 +31,74 @@ namespace Office365RESTExplorerforSites
     /// </summary>
     public sealed partial class ConfigureAppPage : Page
     {
+        private NavigationHelper navigationHelper;
+
+        /// <summary>
+        /// NavigationHelper is used on each page to aid in navigation and 
+        /// process lifetime management
+        /// </summary>
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }
+
         public ConfigureAppPage()
         {
             this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Uri spSiteUri;
-            AuthenticationResult authResult;
-            MessageDialog errorDialog = null;
 
             try
             {
                 //Validate that the input is at least a well-formed URI
                 spSiteUri = new Uri(spSite.Text);
 
-                authResult = await AuthenticationHelper.EnsureAccessTokenAvailableAsync(spSiteUri.AbsoluteUri, PromptBehavior.Auto);
-
-                if (authResult.Status != AuthenticationStatus.Success)
-                {
-                    throw new AuthenticationFailedException(authResult.Error, authResult.ErrorDescription);
-                }
-
-                // Store the relevant data in local settings.
-                ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = spSiteUri.AbsoluteUri;
-                ApplicationData.Current.LocalSettings.Values["UserId"] = authResult.UserInfo.UniqueId;
-                ApplicationData.Current.LocalSettings.Values["UserAccount"] = authResult.UserInfo.DisplayableId;
-                ApplicationData.Current.LocalSettings.Values["AccessToken"] = authResult.AccessToken;
-                ApplicationData.Current.LocalSettings.Values["RefreshToken"] = authResult.RefreshToken;
-                ApplicationData.Current.LocalSettings.Values["AccessTokenExpiresOn"] = authResult.ExpiresOn;
+                await AuthenticationHelper.EnsureAccessTokenAvailableAsync(spSiteUri.AbsoluteUri);
 
                 this.Frame.Navigate(typeof(ItemsPage));
             }
-            catch (FormatException)
-            {
-                // Tell the user to correct the site URL
-                errorDialog = new MessageDialog("It looks like the Office 365 site is not a valid URL.", "Invalid Office 365 site");
-            }
-            catch (AuthenticationFailedException)
+            catch (FormatException fe)
             {
                 // Tell the user that the authentication failed
-                errorDialog = new MessageDialog("We couldn't sign you in to your Office 356 site.", "Authentication failed");
+                MessageDialogHelper.DisplayException(fe);
+                return;
             }
-
-            if (errorDialog != null)
-                await errorDialog.ShowAsync();
-
+            catch (AuthenticationFailedException afe)
+            {
+                // Tell the user that the authentication failed
+                MessageDialogHelper.DisplayException(afe);
+                return;
+            }
         }
+
+        #region NavigationHelper registration
+
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// 
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
+        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedTo(e);
+            await AuthenticationHelper.SignOutAsync();
+            DataSource.Clear();
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
     }
 }
 

@@ -11,11 +11,12 @@
     xmlns:common="using:Office365RESTExplorerforSites.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" FontFamily="Global User Interface">
 
     <Page.Resources>
         <data:JsonObjectConverter x:Key="JsonObjectConverter"/>
         <data:MethodConverter x:Key="MethodConverter"/>
+        <data:BodyConverter x:Key="BodyConverter"/>
         <!-- Collection of items displayed by this page -->
         <CollectionViewSource
             x:Name="itemsViewSource"
@@ -160,8 +161,8 @@
                 <StackPanel x:Name="requestBodyPanel" Grid.Row="4" Orientation="Vertical" >
                     <TextBlock x:Name="bodyLabel" Margin="10,0,0,0" Text="Body" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 </StackPanel>
-                <TextBox x:Name="requestBodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource JsonObjectConverter}, Mode=TwoWay, UpdateSourceTrigger=Explicit}" Grid.Row="4" AcceptsReturn="True"/>
-                <TextBox x:Name="responseBodyText" Grid.Row="4" Margin="10,25,0,0" Text="{Binding Response.Body, Converter={StaticResource JsonObjectConverter}}" AcceptsReturn="True" IsReadOnly="True" Visibility="Collapsed"/>
+                <TextBox x:Name="requestBodyText"  Margin="10,25,0,0" Text="{Binding Request.Body, Converter={StaticResource BodyConverter}, Mode=TwoWay, UpdateSourceTrigger=Explicit}" Grid.Row="4" AcceptsReturn="True"/>
+                <TextBox x:Name="responseBodyText" Grid.Row="4" Margin="10,25,0,0" Text="{Binding Response.Body, Converter={StaticResource BodyConverter}}" AcceptsReturn="True" IsReadOnly="True" Visibility="Collapsed"/>
             </Grid>
         </ScrollViewer>
 

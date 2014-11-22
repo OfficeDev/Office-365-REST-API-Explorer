@@ -17,22 +17,33 @@ using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
 using Office365RESTExplorerforSites.Common;
+using System.Threading.Tasks;
+using Office365RESTExplorerforSites.Helpers;
 
 namespace Office365RESTExplorerforSites
 {
     /// <summary>
     /// A settings flyout that shows the configured username and site
     /// </summary>
-    public sealed partial class SettingsFlyout1 : SettingsFlyout
+    public sealed partial class AccountFlyout : SettingsFlyout
     {
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        public SettingsFlyout1()
+        public AccountFlyout()
         {
             this.InitializeComponent();
 
             // Add the local settings to the view model
-            this.DefaultViewModel["ServiceResourceId"] = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
-            this.DefaultViewModel["UserAccount"] = ApplicationData.Current.LocalSettings.Values["UserAccount"];
+            this.DefaultViewModel["ServiceResourceId"] = AuthenticationHelper.ServiceResourceId;
+            this.DefaultViewModel["UserAccount"] = AuthenticationHelper.UserAccount;
+            
+            if(!String.IsNullOrEmpty(AuthenticationHelper.ServiceResourceId))
+            {
+                this.DefaultViewModel["SignOutVisible"] = Visibility.Visible;
+            }
+            else
+            {
+                this.DefaultViewModel["SignOutVisible"] = Visibility.Collapsed;
+            }
         }
 
         /// <summary>
@@ -41,6 +52,18 @@ namespace Office365RESTExplorerforSites
         public ObservableDictionary DefaultViewModel
         {
             get { return this.defaultViewModel; }
+        }
+
+        private async void SignOut_Click(object sender, RoutedEventArgs e)
+        {
+            await AuthenticationHelper.SignOutAsync();
+
+            // Add the local settings to the view model
+            this.DefaultViewModel["ServiceResourceId"] = null;
+            this.DefaultViewModel["UserAccount"] = null;
+            this.DefaultViewModel["SignOutVisible"] = Visibility.Collapsed;
+
+            (Window.Current.Content as Frame).Navigate(typeof(ConfigureAppPage));
         }
 
     }

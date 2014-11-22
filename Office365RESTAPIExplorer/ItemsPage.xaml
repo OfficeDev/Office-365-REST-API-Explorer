@@ -78,9 +78,11 @@
             <Paragraph>Start by choosing a SharePoint item from the tiles on the left. There are CRUD operations preloaded for lists, list items, and documents.
                 <LineBreak/>
             </Paragraph>
+            <Paragraph>If you need to change the account used to connect to the SharePoint site, go to the Account page in the app settings and sign out.
+                <LineBreak/>
+            </Paragraph>
             <Paragraph>For more information about the REST service in SharePoint, see
                 <Hyperlink NavigateUri="http://msdn.microsoft.com/library/office/fp142380.aspx">Get started with the SharePoint 2013 REST service</Hyperlink>.
-                <LineBreak/>
             </Paragraph>
         </RichTextBlock>
 
@@ -90,6 +92,12 @@
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+                        Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        VerticalAlignment="Top"
+                        AutomationProperties.Name="Back"
+                        AutomationProperties.AutomationId="BackButton"
+                        AutomationProperties.ItemType="Navigation Button"/>
             <TextBlock x:Name="pageTitle" Text="Office 365 REST API Explorer for Sites" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>

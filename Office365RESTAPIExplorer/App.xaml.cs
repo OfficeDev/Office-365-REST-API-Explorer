@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
 using Windows.UI.ApplicationSettings;
+using Office365RESTExplorerforSites.Helpers;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -53,7 +54,7 @@ namespace Office365RESTExplorerforSites
             SettingsCommand generalCommand = new SettingsCommand("account", "Account Settings",
                 (handler) =>
                 {
-                    SettingsFlyout1 sf = new SettingsFlyout1();
+                    AccountFlyout sf = new AccountFlyout();
                     sf.Show();
                 });
 
@@ -113,7 +114,7 @@ namespace Office365RESTExplorerforSites
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                bool configured = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null;
+                bool configured = !String.IsNullOrEmpty(AuthenticationHelper.ServiceResourceId);
                 if (configured)
                     rootFrame.Navigate(typeof(ItemsPage), e.Arguments);
                 else

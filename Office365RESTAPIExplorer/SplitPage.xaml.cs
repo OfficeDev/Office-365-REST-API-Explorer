@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Navigation;
 
 using Windows.Storage;
 using Windows.UI.Popups;
+using Office365RESTExplorerforSites.Helpers;
 
 
 namespace Office365RESTExplorerforSites
@@ -71,6 +72,8 @@ namespace Office365RESTExplorerforSites
 
             this.Unloaded += SplitPage_Unloaded;
 
+            // Subscribe to the AccessTokenChanged event so we can update the data source
+            AuthenticationHelper.AccessTokenChanged += this.OnAccessTokenChanged;
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace Office365RESTExplorerforSites
             var group = await DataSource.GetGroupAsync((String)e.NavigationParameter);
             this.DefaultViewModel["Group"] = group;
             this.DefaultViewModel["Items"] = group.Items;
-            this.DefaultViewModel["ServiceResourceId"] = ApplicationData.Current.LocalSettings.Values["ServiceResourceId"];
+            this.DefaultViewModel["ServiceResourceId"] = AuthenticationHelper.ServiceResourceId;
 
             if (e.PageState == null)
             {
@@ -265,9 +268,21 @@ namespace Office365RESTExplorerforSites
 
         #endregion
 
+        /// <summary>
+        /// Updates the data source when the access token changes.
+        /// </summary>
+        private async void OnAccessTokenChanged(object sender, EventArgs e)
+        {
+            DataSource.Clear();
+            await DataSource.GetGroupsAsync();
+        }
+
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
-            MessageDialog errorDialog = null;
+            // The access token may have expired. 
+            // By calling the EnsureAccessTokenAvailableAsync we ensure that it is still valid, 
+            // or we can get another one.
+            await AuthenticationHelper.EnsureAccessTokenAvailableAsync();
 
             try
             {
@@ -275,36 +290,34 @@ namespace Office365RESTExplorerforSites
                 BindingExpression headersBindingExpression = requestHeadersText.GetBindingExpression(TextBox.TextProperty);
                 headersBindingExpression.UpdateSource();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                errorDialog = new MessageDialog("The headers data is not a well-formed JSON string");
+                // The headers data is not a well-formed JSON string
+                FormatException fe = new FormatException(ex.Message);
+                MessageDialogHelper.DisplayException(fe);
+                return;
             }
             try
             {
-                // Update the headers data source
+                // Update the body data source
                 BindingExpression bodyBindingExpression = requestBodyText.GetBindingExpression(TextBox.TextProperty);
                 bodyBindingExpression.UpdateSource();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                errorDialog = new MessageDialog("The body is not a well-formed JSON string");
+                InvalidOperationException ioe = new InvalidOperationException(ex.Message);
+                MessageDialogHelper.DisplayException(ioe);
+                return;
             }
 
-            if (errorDialog == null)
-            {
-                // There are no errors that stop us from sending the request.
-                // Create a new response item and assign it to the current item in the data source
-                var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
+            
+            // There are no errors that stop us from sending the request.
+            // Create a new response item and assign it to the current item in the data source
+            var selectedItem = (DataItem)itemsViewSource.View.CurrentItem;
                 selectedItem.Response = await DataSource.GetResponseAsync(selectedItem.Request);
 
-                // Show the Response UI
-                VisualStateManager.GoToState(this, "ResponseView", true);
-            }
-            else
-            {
-                // There are errors that prevent us from sending the request. Show the error dialog to the user.
-                await errorDialog.ShowAsync();
-            }
+            // Show the Response UI
+            VisualStateManager.GoToState(this, "ResponseView", true);
         }
 
         private void backToRequest_Click(object sender, RoutedEventArgs e)
