@@ -89,6 +89,9 @@ namespace Office365RESTExplorerforSites
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+
+            // If I'm starting the app or returning to this page, it means that 
+            // I want to sign in again
             await AuthenticationHelper.SignOutAsync();
             DataSource.Clear();
         }

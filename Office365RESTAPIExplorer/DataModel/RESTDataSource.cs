@@ -181,6 +181,7 @@ namespace Office365RESTExplorerforSites.Data
         private static DataSource _dataSource = new DataSource();
 
         private ObservableCollection<DataGroup> _groups = new ObservableCollection<DataGroup>();
+
         public ObservableCollection<DataGroup> Groups
         {
             get { return this._groups; }
@@ -195,7 +196,7 @@ namespace Office365RESTExplorerforSites.Data
 
         public static void Clear()
         {
-            _dataSource.Groups.Clear();
+            _dataSource = new DataSource();
         }
 
         public static async Task<DataGroup> GetGroupAsync(string uniqueId)
@@ -308,73 +309,78 @@ namespace Office365RESTExplorerforSites.Data
 
         private async Task GetSampleDataAsync()
         {
-            if (this._groups.Count != 0)
-                return;
-
-            Uri dataUri = new Uri("ms-appx:///DataModel/InitialData.json");
-
+            Uri dataUri = new Uri("ms-appx:///DataModel/InitialData.json"); 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
-            JsonObject jsonObject = JsonObject.Parse(jsonText);
-            JsonArray jsonArray = jsonObject["Groups"].GetArray();
 
-            foreach (JsonValue groupValue in jsonArray)
+            string accessToken = await AuthenticationHelper.EnsureAccessTokenAvailableAsync();
+
+            lock (this._groups)
             {
-                JsonObject groupObject = groupValue.GetObject();
-                DataGroup group = new DataGroup(groupObject["UniqueId"].GetString(),
-                                                            groupObject["Title"].GetString(),
-                                                            groupObject["Subtitle"].GetString(),
-                                                            groupObject["ImagePath"].GetString(),
-                                                            groupObject["MoreInfoText"].GetString(),
-                                                            new Uri(groupObject["MoreInfoUri"].GetString()));
+                if (this._groups.Count != 0)
+                    return;
 
-                foreach (JsonValue itemValue in groupObject["Items"].GetArray())
+                JsonObject jsonObject = JsonObject.Parse(jsonText);
+                JsonArray jsonArray = jsonObject["Groups"].GetArray();
+
+                foreach (JsonValue groupValue in jsonArray)
                 {
-                    JsonObject itemObject = itemValue.GetObject();
-                    JsonObject requestObject = itemObject["Request"].GetObject();
+                    JsonObject groupObject = groupValue.GetObject();
+                    DataGroup group = new DataGroup(groupObject["UniqueId"].GetString(),
+                                                                groupObject["Title"].GetString(),
+                                                                groupObject["Subtitle"].GetString(),
+                                                                groupObject["ImagePath"].GetString(),
+                                                                groupObject["MoreInfoText"].GetString(),
+                                                                new Uri(groupObject["MoreInfoUri"].GetString()));
 
-                    //Add the Authorization header with the access token.
-                    JsonObject jsonHeaders = requestObject["Headers"].GetObject();
-                    jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString() 
-                        + await AuthenticationHelper.EnsureAccessTokenAvailableAsync());
-
-                    // The body can be a JSON object or string, we need to 
-                    // determine the type of JSON value and use the right 
-                    // method to get the value.
-                    string strBody;
-                    if(requestObject["Body"].ValueType == JsonValueType.Object)
+                    foreach (JsonValue itemValue in groupObject["Items"].GetArray())
                     {
-                        strBody = requestObject["Body"].GetObject().Stringify();
-                    }
-                    else if (requestObject["Body"].ValueType == JsonValueType.String)
-                    {
-                        strBody = requestObject["Body"].GetString();
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("The body should only be of value JSON object or JSON string.");
-                    }
+                        JsonObject itemObject = itemValue.GetObject();
+                        JsonObject requestObject = itemObject["Request"].GetObject();
 
-                    //Create the request object
-                    RequestItem request = new RequestItem(new Uri(requestObject["ApiUrl"].GetString(), UriKind.Relative),
-                                                       requestObject["Method"].GetString(),
-                                                       jsonHeaders,
-                                                       strBody);
+                        //Add the Authorization header with the access token.
+                        JsonObject jsonHeaders = requestObject["Headers"].GetObject();
+                        jsonHeaders["Authorization"] = JsonValue.CreateStringValue(jsonHeaders["Authorization"].GetString()
+                            + accessToken);
 
-                    //Create the data item object
-                    DataItem item = new DataItem(itemObject["UniqueId"].GetString(),
-                                                       itemObject["Title"].GetString(),
-                                                       itemObject["Subtitle"].GetString(),
-                                                       itemObject["ImagePath"].GetString()
-                                                       );
+                        // The body can be a JSON object or string, we need to 
+                        // determine the type of JSON value and use the right 
+                        // method to get the value.
+                        string strBody;
+                        if (requestObject["Body"].ValueType == JsonValueType.Object)
+                        {
+                            strBody = requestObject["Body"].GetObject().Stringify();
+                        }
+                        else if (requestObject["Body"].ValueType == JsonValueType.String)
+                        {
+                            strBody = requestObject["Body"].GetString();
+                        }
+                        else
+                        {
+                            throw new NotSupportedException("The body should only be of value JSON object or JSON string.");
+                        }
 
-                    // Add the request object to the item
-                    item.Request = request;
-                    
-                    //Add the item to the group
-                    group.Items.Add(item);
+                        //Create the request object
+                        RequestItem request = new RequestItem(new Uri(requestObject["ApiUrl"].GetString(), UriKind.Relative),
+                                                           requestObject["Method"].GetString(),
+                                                           jsonHeaders,
+                                                           strBody);
+
+                        //Create the data item object
+                        DataItem item = new DataItem(itemObject["UniqueId"].GetString(),
+                                                           itemObject["Title"].GetString(),
+                                                           itemObject["Subtitle"].GetString(),
+                                                           itemObject["ImagePath"].GetString()
+                                                           );
+
+                        // Add the request object to the item
+                        item.Request = request;
+
+                        //Add the item to the group
+                        group.Items.Add(item);
+                    }
+                    this.Groups.Add(group);
                 }
-                this.Groups.Add(group);
             }
         }
     }
