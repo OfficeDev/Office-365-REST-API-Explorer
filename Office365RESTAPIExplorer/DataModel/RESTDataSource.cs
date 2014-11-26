@@ -196,7 +196,7 @@ namespace Office365RESTExplorerforSites.Data
 
         public static void Clear()
         {
-            _dataSource = new DataSource();
+            _dataSource.Groups.Clear();
         }
 
         public static async Task<DataGroup> GetGroupAsync(string uniqueId)
@@ -315,9 +315,9 @@ namespace Office365RESTExplorerforSites.Data
 
             string accessToken = await AuthenticationHelper.EnsureAccessTokenAvailableAsync();
 
-            lock (this._groups)
+            lock (this.Groups)
             {
-                if (this._groups.Count != 0)
+                if (this.Groups.Count != 0)
                     return;
 
                 JsonObject jsonObject = JsonObject.Parse(jsonText);

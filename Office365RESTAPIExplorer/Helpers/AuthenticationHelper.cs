@@ -16,31 +16,19 @@ namespace Office365RESTExplorerforSites.Helpers
     /// </summary>
     internal static class AuthenticationHelper
     {
-        // Properties of the native client app
-        // The ClientID is added as a resource in App.xaml when you register the app with 
-        // Office 365. As a convenience, we load that value into a variable called ClientID. By doing this, 
-        // whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
-        private static readonly string ClientID = App.Current.Resources["ida:ClientID"].ToString();
-        private static Uri ReturnUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
-
-
         // Properties used for communicating with the Windows Azure AD tenant of choice
         // The AuthorizationUri is added as a resource in App.xaml when you regiter the app with 
         // Office 365. As a convenience, we load that value into a variable called CommonAuthority, adding Common to this Url to signify
         // multi-tenancy. By doing this, whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
-        private static readonly string CommonAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + @"/Common";
+        private static readonly string _commonAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + @"/Common";
+
+        // Private properties used to store the access, refresh tokens
+        // and the access token expiration date
         private static string _accessToken = null;
-        private static DateTimeOffset _expiresOn = DateTimeOffset.MinValue.AddSeconds(10);
+        private static DateTimeOffset _accessTokenExpiresOn = DateTimeOffset.MinValue.AddSeconds(10);
         private static string _refreshToken = null;
 
-        //Creating a Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache to store the 
-        //access token and authority. This starter implementation will not persist data after the user has
-        //logged out. You will need to create your own persistent cache (inheriting from
-        //Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache) in order to handle more complex
-        //persistence and threading requirements.
-        private static TokenCache _tokenCache = new TokenCache();
-
-        public static AuthenticationContext AuthenticationContext { get; set; }
+        private static AuthenticationContext _authenticationContext;
 
         // We need an event to notify other classes that the
         // access token has changed and they need to handle this.
@@ -61,7 +49,7 @@ namespace Office365RESTExplorerforSites.Helpers
 
         private static string _serviceResourceId;
         /// <summary> 
-        /// Gets the account of the user in the form user@domain.tld
+        /// Gets the service resource id
         /// </summary> 
         static internal String ServiceResourceId
         {
@@ -99,7 +87,6 @@ namespace Office365RESTExplorerforSites.Helpers
                 MessageDialogHelper.DisplayException(mcve);
                 return null;
             }
-
         }
 
         /// <summary>
@@ -110,7 +97,7 @@ namespace Office365RESTExplorerforSites.Helpers
         {
             // If the token is not null nor empty and 
             // it it will not expire in the next 10 seconds
-            bool tokenExpired = DateTimeOffset.Compare(_expiresOn.AddSeconds(-10), DateTimeOffset.Now) < 0;
+            bool tokenExpired = DateTimeOffset.Compare(_accessTokenExpiresOn.AddSeconds(-10), DateTimeOffset.Now) < 0;
             if (!String.IsNullOrEmpty(_accessToken) && !tokenExpired)
             {
                 return _accessToken;
@@ -119,21 +106,25 @@ namespace Office365RESTExplorerforSites.Helpers
             {
                 try
                 {
-                    string authority = CommonAuthority;
+                    string authority = _commonAuthority;
 
                     TokenCacheItem cacheItem = null;
 
                     // Create an AuthenticationContext using this authority.
-                    AuthenticationContext = new AuthenticationContext(authority, true, _tokenCache);
+                    _authenticationContext = new AuthenticationContext(authority, true);
 
+                    //Get the current app object, which exposes the ClientId and ReturnUri properties
+                    // that we need in the following call to AcquireTokenAsync
+                    App currentApp = (App)App.Current;
+                    
                     AuthenticationResult authenticationResult;
                     if (!String.IsNullOrEmpty(_refreshToken) && tokenExpired)
                     {
-                        authenticationResult = await AuthenticationContext.AcquireTokenByRefreshTokenAsync(_refreshToken, ClientID, _serviceResourceId);
+                        authenticationResult = await _authenticationContext.AcquireTokenByRefreshTokenAsync(_refreshToken, currentApp.ClientId, _serviceResourceId);
                     }
                     else
                     {
-                        authenticationResult = await AuthenticationContext.AcquireTokenAsync(serviceResourceId, ClientID, ReturnUri);
+                        authenticationResult = await _authenticationContext.AcquireTokenAsync(serviceResourceId, currentApp.ClientId, currentApp.ReturnUri);
                     }
 
                     // Check the result of the authentication operation
@@ -142,21 +133,15 @@ namespace Office365RESTExplorerforSites.Helpers
                         // Something went wrong, probably the user cancelled the sign in process
                         return null;
                     }
-                    else
-                    {
-                        // If a token was acquired, the TokenCache will contain a TokenCacheItem containing
-                        // all the details of the authorization.
-                        cacheItem = AuthenticationContext.TokenCache.ReadItems().First();
-                    }
 
                     // Store relevant info about user and resource
-                    _loggedInUser = cacheItem.UniqueId;
-                    _userAccount = cacheItem.DisplayableId;
-                    _serviceResourceId = cacheItem.Resource;
+                    _loggedInUser = authenticationResult.UserInfo.UniqueId;
+                    _userAccount = authenticationResult.UserInfo.DisplayableId;
+                    _serviceResourceId = serviceResourceId;
 
                     // Store relevant info about the token
                     _accessToken = cacheItem.AccessToken;
-                    _expiresOn = cacheItem.ExpiresOn;
+                    _accessTokenExpiresOn = cacheItem.ExpiresOn;
                     _refreshToken = cacheItem.RefreshToken;
 
                     // The access token is part of the data source. 
@@ -173,7 +158,7 @@ namespace Office365RESTExplorerforSites.Helpers
                     MessageDialogHelper.DisplayException(mcve);
 
                     // Connected services not added correctly, or permissions not set correctly.
-                    AuthenticationContext.TokenCache.Clear();
+                    _authenticationContext.TokenCache.Clear();
                     return null;
                 }
                 catch (AuthenticationFailedException afe)
@@ -181,7 +166,7 @@ namespace Office365RESTExplorerforSites.Helpers
                     MessageDialogHelper.DisplayException(afe);
 
                     // Failed to authenticate the user
-                    AuthenticationContext.TokenCache.Clear();
+                    _authenticationContext.TokenCache.Clear();
                     return null;
 
                 }
@@ -190,7 +175,7 @@ namespace Office365RESTExplorerforSites.Helpers
                     MessageDialogHelper.DisplayException(ae as Exception);
 
                     // Argument exception
-                    AuthenticationContext.TokenCache.Clear();
+                    _authenticationContext.TokenCache.Clear();
                     return null;
                 }
             }
@@ -206,16 +191,17 @@ namespace Office365RESTExplorerforSites.Helpers
                 return;
             }
 
-            await AuthenticationContext.LogoutAsync(_loggedInUser);
-            AuthenticationContext.TokenCache.Clear();
+            await _authenticationContext.LogoutAsync(_loggedInUser);
+
+            //Clear the cache
+            _authenticationContext.TokenCache.Clear();
 
             // Destroy or initialize objects
             _accessToken = null;
-            _expiresOn = DateTimeOffset.MinValue.AddSeconds(10);
+            _accessTokenExpiresOn = DateTimeOffset.MinValue.AddSeconds(10);
             _refreshToken = null;
             _loggedInUser = null;
             _serviceResourceId = null;
-            _tokenCache.Clear();
             _userAccount = null;
         }
     }

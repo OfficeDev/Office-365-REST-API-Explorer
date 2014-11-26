@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using Windows.UI.ApplicationSettings;
 using Office365RESTExplorerforSites.Helpers;
+using Windows.Security.Authentication.Web;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -42,14 +43,27 @@ namespace Office365RESTExplorerforSites
             this.Suspending += OnSuspending;
         }
 
+        // Properties of the native client app
+        // The ClientID is added as a resource in App.xaml when you register the app with 
+        // Office 365. As a convenience, we load that value into a variable called ClientID. By doing this, 
+        // whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
+        internal string ClientId
+        {
+            get { return Resources["ida:ClientID"].ToString(); }
+        }
+        internal Uri ReturnUri
+        {
+            get { return WebAuthenticationBroker.GetCurrentApplicationCallbackUri(); }
+        }
+
         protected override void OnWindowCreated(WindowCreatedEventArgs args)
         {
             base.OnWindowCreated(args);
 
-            SettingsPane.GetForCurrentView().CommandsRequested += onCommandsRequested;
+            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
         }
 
-        private void onCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
             SettingsCommand generalCommand = new SettingsCommand("account", "Account Settings",
                 (handler) =>

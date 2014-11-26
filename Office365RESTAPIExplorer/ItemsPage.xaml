@@ -78,7 +78,7 @@
             <Paragraph>Start by choosing a SharePoint item from the tiles on the left. There are CRUD operations preloaded for lists, list items, and documents.
                 <LineBreak/>
             </Paragraph>
-            <Paragraph>If you need to change the account used to connect to the SharePoint site, go to the Account page in the app settings and sign out.
+            <Paragraph>If you need to change the account used to connect to the SharePoint site, go back on this page or go to the Account page in the app settings and sign out.
                 <LineBreak/>
             </Paragraph>
             <Paragraph>For more information about the REST service in SharePoint, see
