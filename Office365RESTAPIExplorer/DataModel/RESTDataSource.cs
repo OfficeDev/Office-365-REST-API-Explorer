@@ -56,7 +56,8 @@ namespace Office365RESTExplorerforSites.Data
             this.ApiUrl = apiUrl.OriginalString;
 
             // Validate that the method is either "GET" or "POST"
-            if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
+            if (String.Compare(method, "GET", StringComparison.CurrentCultureIgnoreCase) != 0 
+                && String.Compare(method, "POST", StringComparison.CurrentCultureIgnoreCase) != 0)
                 throw new ArgumentOutOfRangeException("method", "The HTTP method can only be GET or POST.");
             else
                 this.Method = method;
@@ -313,6 +314,7 @@ namespace Office365RESTExplorerforSites.Data
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
 
+            // Ensure that we have a valid access token before updating the data
             string accessToken = await AuthenticationHelper.EnsureAccessTokenAvailableAsync();
 
             lock (this.Groups)

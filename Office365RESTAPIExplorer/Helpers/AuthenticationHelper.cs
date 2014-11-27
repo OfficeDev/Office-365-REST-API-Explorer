@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Office365.Discovery;
 using Microsoft.Office365.OAuth;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Windows.Security.Authentication.Web;
-using Office365RESTExplorerforSites.Data;
+using Windows.Storage;
 
 namespace Office365RESTExplorerforSites.Helpers
 {
@@ -22,68 +19,143 @@ namespace Office365RESTExplorerforSites.Helpers
         // multi-tenancy. By doing this, whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
         private static readonly string _commonAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + @"/Common";
 
-        // Private properties used to store the access, refresh tokens
-        // and the access token expiration date
-        private static string _accessToken = null;
-        private static DateTimeOffset _accessTokenExpiresOn = DateTimeOffset.MinValue.AddSeconds(10);
-        private static string _refreshToken = null;
+        // Private property used to store the access token
+        // We need to detect if the access token changed.
+        private static string _accessToken
+        {
+            get
+            {
+                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("AccessToken")
+                    && ApplicationData.Current.LocalSettings.Values["AccessToken"] != null)
+                {
+                    return ApplicationData.Current.LocalSettings.Values["AccessToken"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values["AccessToken"] = value;
+            }
+        }
 
         private static AuthenticationContext _authenticationContext;
+
+        // Property for storing the logged-in user so that we can display user properties later.
+        //This value is populated when the user connects to the service and made null when the user signs out.
+        private static string _loggedInUser
+        {
+            get
+            {
+                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("LoggedInUser") 
+                    && ApplicationData.Current.LocalSettings.Values["LoggedInUser"] != null)
+                {
+                    return ApplicationData.Current.LocalSettings.Values["LoggedInUser"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values["LoggedInUser"] = value;
+            }
+        }
+
+        //Property for storing and returning the authority used by the last authentication.
+        //This value is populated when the user connects to the service and made null when the user signs out.
+        private static string _lastAuthority
+        {
+            get
+            {
+                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("LastAuthority") 
+                    && ApplicationData.Current.LocalSettings.Values["LastAuthority"] != null)
+                {
+                    return ApplicationData.Current.LocalSettings.Values["LastAuthority"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values["LastAuthority"] = value;
+            }
+        }
 
         // We need an event to notify other classes that the
         // access token has changed and they need to handle this.
         // For example, they need to update the data source
-        public static event EventHandler AccessTokenChanged = delegate { };
+        internal static event EventHandler AccessTokenChanged = delegate { };
 
-        private static string _loggedInUser; 
-        /// <summary> 
-        /// Gets the logged in user. 
-        /// </summary> 
-        static internal String LoggedInUser 
-        { 
-            get 
-            { 
-                return _loggedInUser; 
-            } 
-        }
-
-        private static string _serviceResourceId;
         /// <summary> 
         /// Gets the service resource id
         /// </summary> 
-        static internal String ServiceResourceId
+        internal static string ServiceResourceId
         {
             get
             {
-                return _serviceResourceId;
+                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("ServiceResourceId")
+                    && ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] != null)
+                {
+                    return ApplicationData.Current.LocalSettings.Values["ServiceResourceId"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values["ServiceResourceId"] = value;
             }
         }
 
-        private static string _userAccount;
         /// <summary> 
         /// Gets the account of the user in the form user@domain.tld
         /// </summary> 
-        static internal String UserAccount
+        internal static string UserAccount
         {
             get
             {
-                return _userAccount;
+                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("UserAccount")
+                    && ApplicationData.Current.LocalSettings.Values["UserAccount"] != null)
+                {
+                    return ApplicationData.Current.LocalSettings.Values["UserAccount"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values["UserAccount"] = value;
             }
         }
 
         /// <summary>
         /// Checks that an access token is available.
+        /// This method requires that the ServiceResourceId has been set previously.
         /// </summary>
         /// <returns>The access token.</returns>
-        public static async Task<string> EnsureAccessTokenAvailableAsync()
+        internal static async Task<string> EnsureAccessTokenAvailableAsync()
         {
-            if(!String.IsNullOrEmpty(_serviceResourceId))
+            if(!String.IsNullOrEmpty(ServiceResourceId))
             {
-                return await EnsureAccessTokenAvailableAsync(_serviceResourceId);
+                return await EnsureAccessTokenAvailableAsync(ServiceResourceId);
             }
             else
             {
-                MissingConfigurationValueException mcve = new MissingConfigurationValueException("To use this method you have to call EnsureAccessTokenCreatedAsync(string serviceResourceId) at least once.");
+                MissingConfigurationValueException mcve = 
+                    new MissingConfigurationValueException(
+                        "To use this method you have to call EnsureAccessTokenCreatedAsync(string serviceResourceId) at least once."
+                        );
                 MessageDialogHelper.DisplayException(mcve);
                 return null;
             }
@@ -93,98 +165,100 @@ namespace Office365RESTExplorerforSites.Helpers
         /// Checks that an access token is available.
         /// </summary>
         /// <returns>The access token.</returns>
-        public static async Task<string> EnsureAccessTokenAvailableAsync(string serviceResourceId)
+        internal static async Task<string> EnsureAccessTokenAvailableAsync(string serviceResourceId)
         {
-            // If the token is not null nor empty and 
-            // it it will not expire in the next 10 seconds
-            bool tokenExpired = DateTimeOffset.Compare(_accessTokenExpiresOn.AddSeconds(-10), DateTimeOffset.Now) < 0;
-            if (!String.IsNullOrEmpty(_accessToken) && !tokenExpired)
+            try
             {
-                return _accessToken;
-            }
-            else
-            {
-                try
+                // First, look for the authority used during the last authentication.
+                // If that value is not populated, use _commonAuthority.
+                string authority = null;
+                if (String.IsNullOrEmpty(_lastAuthority))
                 {
-                    string authority = _commonAuthority;
+                    authority = _commonAuthority;
+                }
+                else
+                {
+                    authority = _lastAuthority;
+                }
 
-                    TokenCacheItem cacheItem = null;
+                // Create an AuthenticationContext using this authority.
+                _authenticationContext = new AuthenticationContext(authority, true);
 
-                    // Create an AuthenticationContext using this authority.
-                    _authenticationContext = new AuthenticationContext(authority, true);
-
-                    //Get the current app object, which exposes the ClientId and ReturnUri properties
-                    // that we need in the following call to AcquireTokenAsync
-                    App currentApp = (App)App.Current;
+                //Get the current app object, which exposes the ClientId and ReturnUri properties
+                // that we need in the following call to AcquireTokenAsync
+                App currentApp = (App)App.Current;
                     
-                    AuthenticationResult authenticationResult;
-                    if (!String.IsNullOrEmpty(_refreshToken) && tokenExpired)
-                    {
-                        authenticationResult = await _authenticationContext.AcquireTokenByRefreshTokenAsync(_refreshToken, currentApp.ClientId, _serviceResourceId);
-                    }
-                    else
-                    {
-                        authenticationResult = await _authenticationContext.AcquireTokenAsync(serviceResourceId, currentApp.ClientId, currentApp.ReturnUri);
-                    }
+                AuthenticationResult authenticationResult;
 
+                // An attempt is first made to acquire the token silently. 
+                // If that fails, then we try to acquire the token by prompting the user.
+                authenticationResult = await _authenticationContext.AcquireTokenSilentAsync(serviceResourceId, currentApp.ClientId);
+
+                if (authenticationResult.Status != AuthenticationStatus.Success)
+                {
+                    // Try to authenticate by prompting the user
+                    authenticationResult = await _authenticationContext.AcquireTokenAsync(serviceResourceId, currentApp.ClientId, currentApp.ReturnUri);
+                    
                     // Check the result of the authentication operation
                     if (authenticationResult.Status != AuthenticationStatus.Success)
                     {
                         // Something went wrong, probably the user cancelled the sign in process
                         return null;
                     }
+                }
 
-                    // Store relevant info about user and resource
-                    _loggedInUser = authenticationResult.UserInfo.UniqueId;
-                    _userAccount = authenticationResult.UserInfo.DisplayableId;
-                    _serviceResourceId = serviceResourceId;
+                // Store relevant info about user and resource
+                _loggedInUser = authenticationResult.UserInfo.UniqueId;
+                // The new last authority is in the form https://login.windows.net/{TenantId}
+                _lastAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + "/" + authenticationResult.TenantId;
+                UserAccount = authenticationResult.UserInfo.DisplayableId;
+                ServiceResourceId = serviceResourceId;
 
-                    // Store relevant info about the token
-                    _accessToken = cacheItem.AccessToken;
-                    _accessTokenExpiresOn = cacheItem.ExpiresOn;
-                    _refreshToken = cacheItem.RefreshToken;
-
-                    // The access token is part of the data source. 
-                    // We should update the data source whenever the token changes
-                    //Update the data source
+                // If the acccess token has changed
+                if (!String.Equals(_accessToken, authenticationResult.AccessToken))
+                {
+                    // Raise an event to let other components know that the token has changed, 
+                    // so they can react accordingly (for example, updating the data source)
                     AccessTokenChanged(null, EventArgs.Empty);
-
-                    return _accessToken;
+                    // and store the new acces token
+                    _accessToken = authenticationResult.AccessToken;
                 }
-                // The following is a list of all exceptions you should consider handling in your app.
-                // In the case of this sample, the exceptions are handled by returning null upstream. 
-                catch (MissingConfigurationValueException mcve)
-                {
-                    MessageDialogHelper.DisplayException(mcve);
 
-                    // Connected services not added correctly, or permissions not set correctly.
-                    _authenticationContext.TokenCache.Clear();
-                    return null;
-                }
-                catch (AuthenticationFailedException afe)
-                {
-                    MessageDialogHelper.DisplayException(afe);
+                return _accessToken;
+            }
+            // The following is a list of all exceptions you should consider handling in your app.
+            // In the case of this sample, the exceptions are handled by returning null upstream. 
+            catch (MissingConfigurationValueException mcve)
+            {
+                MessageDialogHelper.DisplayException(mcve);
 
-                    // Failed to authenticate the user
-                    _authenticationContext.TokenCache.Clear();
-                    return null;
+                // Connected services not added correctly, or permissions not set correctly.
+                _authenticationContext.TokenCache.Clear();
+                return null;
+            }
+            catch (AuthenticationFailedException afe)
+            {
+                MessageDialogHelper.DisplayException(afe);
 
-                }
-                catch (ArgumentException ae)
-                {
-                    MessageDialogHelper.DisplayException(ae as Exception);
+                // Failed to authenticate the user
+                _authenticationContext.TokenCache.Clear();
+                return null;
 
-                    // Argument exception
-                    _authenticationContext.TokenCache.Clear();
-                    return null;
-                }
+            }
+            catch (ArgumentException ae)
+            {
+                MessageDialogHelper.DisplayException(ae as Exception);
+
+                // Argument exception
+                _authenticationContext.TokenCache.Clear();
+                return null;
             }
         }
 
         /// <summary>
         /// Signs the user out of the service.
         /// </summary>
-        public static async Task SignOutAsync()
+        internal static async Task SignOutAsync()
         {
             if (string.IsNullOrEmpty(_loggedInUser))
             {
@@ -198,11 +272,10 @@ namespace Office365RESTExplorerforSites.Helpers
 
             // Destroy or initialize objects
             _accessToken = null;
-            _accessTokenExpiresOn = DateTimeOffset.MinValue.AddSeconds(10);
-            _refreshToken = null;
             _loggedInUser = null;
-            _serviceResourceId = null;
-            _userAccount = null;
+            _lastAuthority = null;
+            ServiceResourceId = null;
+            UserAccount = null;
         }
     }
 }
