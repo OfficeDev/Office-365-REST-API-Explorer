@@ -30,5 +30,8 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="enterpriseAuthentication" />
+    <Capability Name="privateNetworkClientServer" />
+    <Capability Name="sharedUserCertificates" />
   </Capabilities>
 </Package>

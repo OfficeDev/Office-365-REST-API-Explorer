@@ -154,7 +154,7 @@ namespace Office365RESTExplorerforSites.Helpers
             {
                 MissingConfigurationValueException mcve = 
                     new MissingConfigurationValueException(
-                        "To use this method you have to call EnsureAccessTokenCreatedAsync(string serviceResourceId) at least once."
+                        "To use this method you have to call EnsureAccessTokenAvailableAsync(string serviceResourceId) at least once."
                         );
                 MessageDialogHelper.DisplayException(mcve);
                 return null;
@@ -182,7 +182,13 @@ namespace Office365RESTExplorerforSites.Helpers
                 }
 
                 // Create an AuthenticationContext using this authority.
-                _authenticationContext = new AuthenticationContext(authority, true);
+                _authenticationContext = new AuthenticationContext(authority);
+                
+                // Set the value of _authenticationContext.UseCorporateNetwork to true so that you  
+                // can use this app inside a corporate intranet. If the value of UseCorporateNetwork  
+                // is true, you also need to add the Enterprise Authentication, Private Networks, and 
+                // Shared User Certificates capabilities in the Package.appxmanifest file. 
+                _authenticationContext.UseCorporateNetwork = true; 
 
                 //Get the current app object, which exposes the ClientId and ReturnUri properties
                 // that we need in the following call to AcquireTokenAsync
