@@ -188,7 +188,7 @@ namespace Office365RESTExplorerforSites.Helpers
                 // can use this app inside a corporate intranet. If the value of UseCorporateNetwork  
                 // is true, you also need to add the Enterprise Authentication, Private Networks, and 
                 // Shared User Certificates capabilities in the Package.appxmanifest file. 
-                _authenticationContext.UseCorporateNetwork = true; 
+                //_authenticationContext.UseCorporateNetwork = true; 
 
                 //Get the current app object, which exposes the ClientId and ReturnUri properties
                 // that we need in the following call to AcquireTokenAsync
