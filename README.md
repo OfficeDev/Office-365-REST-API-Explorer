@@ -25,6 +25,7 @@ You can perform CRUD operations on the following items in a SharePoint site:
 
 This sample requires the following:
 
+  - Windows 8.1
   - Visual Studio 2013 with Update 3.
   - [Office 365 API Tools version 1.3.41104.1](https://visualstudiogallery.msdn.microsoft.com/a15b85e6-69a7-4fdf-adda-a38066bb5155).
   - An [Office 365 developer site](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1).
