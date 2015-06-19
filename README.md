@@ -79,4 +79,18 @@ Known issues
 
   - You need to provide a site that is at the root of the web application. For example: the https://*&lt;tenant&gt;*.sharepoint.com site. The sign in process fails with non-root site collections.
 
-Copyright (c) Microsoft. All rights reserved.
+## Additional resources ##
+
+- [Office 365 APIs platform overview](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
+- [Office 365 API code samples and videos](https://msdn.microsoft.com/office/office365/howto/starter-projects-and-code-samples)
+- [Office developer code samples](http://dev.office.com/code-samples)
+- [Office dev center](http://dev.office.com/)
+- [Connecting to Office 365 in Windows Store, Phone, and universal apps](https://github.com/OfficeDev/O365-Win-Connect)
+- [Office 365 Code Snippets for Windows](https://github.com/OfficeDev/O365-Win-Snippets)
+- [Office 365 Starter Project for Windows Store App](https://github.com/OfficeDev/O365-Windows-Start)
+- [Office 365 REST API Explorer for Sites](https://github.com/OfficeDev/Office-365-REST-API-Explorer)
+- [Office 365 Profile sample for Windows](https://github.com/OfficeDev/O365-Win-Profile)
+
+## Copyright ##
+
+Copyright (c) 2014 Microsoft. All rights reserved.
