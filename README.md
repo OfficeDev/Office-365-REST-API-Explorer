@@ -78,7 +78,7 @@ You may run into an authentication error after deploying and running if apps do 
 Known issues
 
   - You need to provide a site that is at the root of the web application. For example: the https://*&lt;tenant&gt;*.sharepoint.com site. The sign in process fails with non-root site collections.
-
+  
 ## Additional resources ##
 
 - [Office 365 APIs platform overview](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
@@ -94,3 +94,13 @@ Known issues
 ## Copyright ##
 
 Copyright (c) 2014 Microsoft. All rights reserved.
+=======
+## Questions and comments
+
+We'd love to get your feedback on the Office 365 REST API Explorer project. You can send your questions and suggestions to us in the [Issues](https://github.com/OfficeDev/Office-365-REST-API-Explorer/issues) section of this repository.
+
+Questions about Office 365 development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/Office365+API). Make sure that your questions or comments are tagged with [Office365] and [API].
+  
+
+
+Copyright (c) Microsoft. All rights reserved.
