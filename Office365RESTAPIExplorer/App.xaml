@@ -10,11 +10,7 @@
     
 
     <Application.Resources>
-
-        <!-- Application-specific resources -->
-        <x:String x:Key="AppName">Office 365 REST API for Sites</x:String>
-        <x:String x:Key="ida:AuthorizationUri">https://login.windows.net</x:String>
-        <x:String x:Key="ida:ClientID"></x:String>
+        <x:String x:Key="ida:AuthorizationUri">https://login.microsoftonline.com</x:String>
     </Application.Resources>
 </Application>
 
