@@ -94,3 +94,6 @@ _vti_pvt/
 
 #Ignore private folder
 /Private/
+
+#Ignore .vs folder
+.vs
