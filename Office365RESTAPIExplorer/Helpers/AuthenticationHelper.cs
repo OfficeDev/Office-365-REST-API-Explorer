@@ -17,7 +17,7 @@ namespace Office365RESTExplorerforSites.Helpers
         // The AuthorizationUri is added as a resource in App.xaml when you regiter the app with 
         // Office 365. As a convenience, we load that value into a variable called CommonAuthority, adding Common to this Url to signify
         // multi-tenancy. By doing this, whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
-        private static readonly string _commonAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + @"/Common";
+        private static readonly string _commonAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + "Common";
 
         // Private property used to store the access token
         // We need to detect if the access token changed.
@@ -216,7 +216,7 @@ namespace Office365RESTExplorerforSites.Helpers
                 // Store relevant info about user and resource
                 _loggedInUser = authenticationResult.UserInfo.UniqueId;
                 // The new last authority is in the form https://login.windows.net/{TenantId}
-                _lastAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + "/" + authenticationResult.TenantId;
+                _lastAuthority = App.Current.Resources["ida:AuthorizationUri"].ToString() + authenticationResult.TenantId;
                 UserAccount = authenticationResult.UserInfo.DisplayableId;
                 ServiceResourceId = serviceResourceId;
 
