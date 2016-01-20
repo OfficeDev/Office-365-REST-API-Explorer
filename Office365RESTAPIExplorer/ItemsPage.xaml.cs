@@ -2,27 +2,9 @@
 
 using Office365RESTExplorerforSites.Common;
 using Office365RESTExplorerforSites.Data;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Windows.Input;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-using Windows.Storage;
-using Windows.UI.Popups;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Office365.OAuth;
-using Office365RESTExplorerforSites.Helpers;
 
 namespace Office365RESTExplorerforSites
 {

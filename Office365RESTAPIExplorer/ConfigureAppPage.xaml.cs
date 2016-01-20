@@ -1,27 +1,13 @@
 ﻿// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 
+using Microsoft.Office365.OAuth;
+using Office365RESTExplorerforSites.Common;
+using Office365RESTExplorerforSites.Data;
+using Office365RESTExplorerforSites.Helpers;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Windows.Storage;
-using Microsoft.Office365.OAuth;
-using Windows.UI.Popups;
-using Office365RESTExplorerforSites.Helpers;
-using Office365RESTExplorerforSites.Data;
-using Office365RESTExplorerforSites.Common;
 
 namespace Office365RESTExplorerforSites
 {

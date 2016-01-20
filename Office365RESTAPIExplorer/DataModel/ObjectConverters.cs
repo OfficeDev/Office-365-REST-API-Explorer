@@ -1,14 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Newtonsoft.Json;
-using Windows.UI.Xaml.Data;
+using System;
 using Windows.Data.Json;
+using Windows.UI.Xaml.Data;
 
 namespace Office365RESTExplorerforSites.Data
 {

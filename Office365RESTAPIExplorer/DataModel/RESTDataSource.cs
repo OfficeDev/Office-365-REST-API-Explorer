@@ -1,21 +1,18 @@
 ﻿// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 
+using Office365RESTExplorerforSites.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Storage;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-
-using System.IO;
-using System.Net;
-using System.Text;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Office365RESTExplorerforSites.Helpers;
 
 // The data model represents a hierarchical organization of objects as follows
 // DataSource -> DataGroups -> DataItems -> ResponseItem

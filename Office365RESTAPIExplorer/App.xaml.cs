@@ -1,28 +1,15 @@
 ﻿// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 
 using Office365RESTExplorerforSites.Common;
-
+using Office365RESTExplorerforSites.Helpers;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Security.Authentication.Web;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-using Windows.Storage;
-using Windows.UI.ApplicationSettings;
-using Office365RESTExplorerforSites.Helpers;
-using Windows.Security.Authentication.Web;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
