@@ -39,7 +39,14 @@ namespace Office365RESTExplorerforSites
         // whenever you register the app using another account, this variable will be in sync with whatever is in App.xaml.
         internal string ClientId
         {
-            get { return Resources["ida:ClientID"].ToString(); }
+            get {
+                // Older versions of thye 'Connected Service' experience
+                // inject ClientID to App.xaml, newer inject ClientId.
+                // Just check for both.
+                return Resources.ContainsKey("ida:ClientId") ?
+                    Resources["ida:ClientId"].ToString() :
+                    Resources["ida:ClientID"].ToString();
+            }
         }
         internal Uri ReturnUri
         {
