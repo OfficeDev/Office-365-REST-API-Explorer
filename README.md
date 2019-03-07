@@ -1,3 +1,13 @@
+---
+topic: sample
+products:
+- Office 365
+languages:
+- C#
+extensions:
+  contentType: samples
+  createdDate: 10/7/2014 10:32:11 AM
+---
 # Office 365 REST API Explorer for Sites #
 
 ## Overview ##
