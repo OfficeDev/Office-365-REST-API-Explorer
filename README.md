@@ -7,10 +7,13 @@ languages:
 extensions:
   contentType: samples
   createdDate: 10/7/2014 10:32:11 AM
+urlFragment: office-365-rest-api-explorer-for-sites
+description: "An example that shows how to perform HTTP requests to some of the REST endpoints in SharePoint sites hosted on Office 365."
 ---
-# Office 365 REST API Explorer for Sites #
 
-## Overview ##
+# Office 365 REST API Explorer for Sites
+
+## Overview
 
 This app is an example that shows SharePoint developers how to perform HTTP requests to some of the REST endpoints in SharePoint sites hosted on Office 365.
 
@@ -31,7 +34,7 @@ You can perform CRUD operations on the following items in a SharePoint site:
 - List items
 - Files
 
-## Prerequisites and Configuration ##
+## Prerequisites and Configuration
 
 This sample requires the following:
 
@@ -40,7 +43,7 @@ This sample requires the following:
   - [Office 365 API Tools version 1.3.41104.1](https://visualstudiogallery.msdn.microsoft.com/a15b85e6-69a7-4fdf-adda-a38066bb5155).
   - An Office 365 developer site. [Join the Office 365 Developer Program and get a free 1 year subscription to Office 365](https://aka.ms/devprogramsignup).
 
-###Configure the sample
+### Configure the sample
 
 Follow these steps to configure the sample.
 
@@ -58,13 +61,13 @@ Follow these steps to configure the sample.
 		- Read items in all site collections
    7. After clicking OK in the Services Manager dialog box, assemblies for connecting to the Office 365 REST API will be added to your project.
 
-## Build ##
+## Build
 
 1. Open the solution in Visual Studio and press F5.
 2. In the initial screen, provide the URL of your SharePoint site.
 3. Sign in with your organizational account to Office 365.
 
-## Project Components of Interest ##
+## Project Components of Interest
 
 **Pages**
 
@@ -81,7 +84,7 @@ Follow these steps to configure the sample.
 - ResponseItem
 - InitialData.json
 
-## Troubleshooting ##
+## Troubleshooting
 
 You may run into an authentication error after deploying and running if apps do not have the ability to access account information in the [Windows Privacy Settings](http://www.microsoft.com/security/online-privacy/windows.aspx) menu. Set **Let my apps access my name, picture, and other account info** to **On**.
 
@@ -95,7 +98,7 @@ We'd love to get your feedback on the Office 365 REST API Explorer project. You 
 
 Questions about Office 365 development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/Office365+API). Make sure that your questions or comments are tagged with [Office365] and [API].
   
-## Additional resources ##
+## Additional resources
 
 - [Office 365 APIs platform overview](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
 - [Office 365 API code samples and videos](https://msdn.microsoft.com/office/office365/howto/starter-projects-and-code-samples)
@@ -107,7 +110,7 @@ Questions about Office 365 development in general should be posted to [Stack Ove
 - [Office 365 REST API Explorer for Sites](https://github.com/OfficeDev/Office-365-REST-API-Explorer)
 - [Office 365 Profile sample for Windows](https://github.com/OfficeDev/O365-Win-Profile)
 
-## Copyright ##
+## Copyright
 
 Copyright (c) 2014 Microsoft. All rights reserved.
 
